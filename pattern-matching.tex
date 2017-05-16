@@ -1,0 +1,110 @@
+\chapter{Odhaľovanie parsovacích vzorov správ}
+
+Odhaľovanie parsovacích vzorov sa z rozšírením distibuovaných sytémov a cloudu a tým spojeného nárastu objemu logovacích správ stáva pomerne dobre študovaným problémom. Bolo vyvynutých mnoho algoritmov, riešiaci daný problém, ale žiaden z nich zatiaľ neponúka postačujúce riešenie. Medzi najčastejšie používané patria riešenia založené na analýze zdrojových kódov alebo na metóde clustrovania.
+
+\section{Analýza zdrojových kódov}
+
+Je to pomerne presná metóda, kde za pomoci statickej analýzy vieme vo väčšine prípadov odhaliť všetky parsovacie vzory.
+Rôzne programovacie jazyky ale používajú rôzny štýl logovania. Programovací jazyk C napr. používa volanie funkcie \emph{printf}.
+V tomto prípade sa snažíme nájsť volania tejto funkcie a zároveň odvodiť typy parametrov.
+Pre objektovo orientované jazyky je situácia trochu komplikovanejšia, ako môžme vidieť na obr. \ref{fig:static-analysis}. Zaprvé vo väčšine prípadov používajú nejakú logovaciu abstrakciu a jej rozhranie, ktoré musíme identifikovať. Zadruhé v objektovo orientovanom programovaní sa na výpis reprezentácie objektu používa metóda \emph{toString}, preto nájdené parsovacie vzory sú neúplné a je nutné ďalej rekurzívne investigovať metódu \emph{toString} na všetkych parametroch nájdeného parsovacieho vzoru.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.9\textwidth}
+\lstset{tabsize=4,columns=flexible,breaklines=true,breakatwhitespace=true, showstringspaces=false}
+\begin{lstlisting}
+class Session {
+	String uid;
+	
+	@Override
+	public String toString() {
+		return "session with uid=" + uid;
+	}
+}
+
+if (logger.isDebugEnabled()) {
+	logger.debug("Transport error in " + session);
+}
+
+2017-05-12 20:52:39 DEBUG SomeService:19 - Transport error in session with uid=92ebcb67fe33s
+\end{lstlisting} 		
+\end{minipage} 
+\caption{Logovacia správa a kód ktorý ju spôsobil v jazyku Java}
+\label{fig:static-analysis}
+\end{figure}
+
+Hlavným negatívom, ktorý vyplýva z podstaty analýzy zdrojových kódov, je značné množstvo času potrebné na správne identifikovanie parsovacích vzorov. Túto analýzu musíme vykonať pre každú novú verziu zdrojových kódov, čo ďalej zvyšuje zložitosť. Podmienkou u tejto metódy je aj potreba mať prístup k zdrojovým kódom, čo nie je vždy možné. 
+
+\section{ Metóda clustrovania}
+
+Clustrovanie vieme popísať ako hľadanie rozdelenia logovacích správ do konečnej skupiny kategórií - clustrov, kde správy v jednom clustry sú si navzájom podobné a čo najviac rozdielne od členov iných clustrov  \parencite{iplom} . Na určenie ako veľmi sú dve správy podobné sa používa vzdialenostná funkcia. Vzialenostné funkcie tradičných clustrovacích algoritmov nie sú vhodné pre logovacie súbory pretože vyžadujú tieto vlastnosti:
+
+\begin{enumerate}
+  \item fixný a nízky počet tokenov
+  \item tokeny prevažne numerického tvaru
+  \item možnosť ignorovať poradie
+\end{enumerate}
+
+Preto nie je zrejmé, ako merať podobnosť logovacích správ tradičnými algoritmami, aj keď existuje niekoľko známych funkcií ako napr. Hammingova vzdialenosť alebo Jaccardov koeficient \parencite{slct}. Spôsobov, podľa ktorých možno jednotlivé clustre vytvárať je niekoľko a každý algoritmus používa svoj postup, ako si ukážeme ďalej. Najprv si ale pre nasledujúcu časť zadefinujeme pojmy, ktoré budeme používať pri popise algoritmov. Logovací súbor budeme nazývať dataset, jeho jednotlivé riadky budeme považovať za správy, ktorých každé slovo bude reprezentovať jeden token. Ďalej kvôli všeobecne zaužívanej konvencii budeme dynamickú časť nájdeného parsovacieho vzoru označovať ako wildcard a v samotnom vzore ho budeme nahradzovať znakom \emph{*}.
+
+\subsection{SLCT - Simple Logfile Clustering Tool}
+Tvorca SLCT \parencite{slct, slctloghound} si všíma 2 kľúčové vlastnosti logovacích súborov o ktoré sa opieral pri tvorbe algoritmu. Prvá vlastnosť je, že väčšina slov sa v datasete nevyskytuje často a nezanedbateľná časť dokonca len raz. Druhá vlastnosť hovorí, že medzi slovami, ktoré sa vyskytujú často je silná korelácia. Neformálne povedané, často sa vyskytujúce slová tvoria statickú časť a zvyšné slova dynamickú časť logovacej správy. Algoritmus na vstupe očakáva hraničnú hodnotu N, podľa ktorej určí, či bude dané slovo považované za statickú alebo dynamickú časť.  SLCT pracuje v nasledujúcich troch krokoch.
+
+\begin{enumerate}
+  \item Všetky správy v datasete rozloží na dvojice \emph{(pozícia, token)} a spočíta počet výskytov danej dvojice v datasete. Pre rozklad správy na tokeny sa používa ako delimiter znak medzery. Ak výskyt dvojice prekračuje hraničnú hodnotu N, dvojicu nazývame frekventovaná. Napr. \emph{(1, Generating)}.
+  \item Pre každú správu v datasete vezme algoritmus všetky frekventované dvojice, ktoré potom spolu tvoria kandidátnu množinu, napr. \emph{{(1,Generating), (3,bit), (4,RSA), (5, key)}}. 
+  \item Ak sa kandidátna množina nachádza v logovacom súbore častejšie ako hraničná hodnota N, potom je zvolený sa cluster. Cluster je vytvorený doplnením wildcard za chýbajúce pozície v riadku, takže vysledný pattern vyzerá takto \emph{Generating * bit RSA key}.
+\end{enumerate}
+
+Riadky ktoré nepatria k žiadnemu clustru, tvoria špeciálny cluster nazývaný outliers. Všimnime si, algoritmus vôbec nezaznamenáva pozície medzier ani počet tokenov v pôvodnej správe. Preto kvôli spôsobu akým tvorí clustre, SLCT nevie odhaliť wildcard na konci riadku. Vezmime si napr. kandidátnu množinu $\{(1,Illegal), (2,user), (4,from)\} $. SLCT vytvorí pattern \emph{Illegal user * from}. Správny pattern by mal vyzerať takto  \emph{Illegal user * from *}.
+
+\subsection{Naggapan-Vouk algoritmus}
+Kľúčová vlastnosť na ktorej Naggapan a Vouk postavili ich algoritmus \parencite{nagappanvouk} je skutočnosť, že keď sa konkrétny pattern nachádza v datasete na viacerých miestach z rôznymi parametrami, jeho statická časť sa bude vyskytovať vo väčšine prípadov, ale dynamická časť len pár krát. Preto Nagappan-Vouk buduje tabuľku frekvencií ako vidíme na obr. \ref{fig:nagappan}. Priebeh algoritmu:
+
+\begin{enumerate}
+  \item Vybudujem si frekvenčnú tabuľku, ktorá obsahuje informáciu koľko krát sa dané slovo nachádza na konkrétnej pozícií v datasete. Neformálne povedané, riadky sú tokeny a stĺpce sú pozície na ktorých sa token nachádza.
+  \item Pre každú správu si vo frekvenčnej tabuľke vyhľadáme frekvencie všetkých tokenov správy. Nájdeme frekvenciu, ktorá sa vyskytuje najčastejšie. V prípade, že takýchto frekvencií je viac, použijeme nižšiu frekvenciu.
+  \item Každý token, ktorý má frekvenciu vyššiu alebo rovnú ako frekvencia nájdená v minulom kroku, je označený ako statická časť. Zvyšné slová sú analogicky dynamická časť.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.9\textwidth}
+\centering
+\begin{tabularx}{175px}{ | X | c | c | c | c | c | }
+\hline
+           & 1 & 2 & 3 & 4 & 5 \\ \hline
+768        & 0 & 1 & 0 & 0 & 0 \\ \hline
+2048       & 0 & 1 & 0 & 0 & 0 \\ \hline
+bit        & 0 & 0 & 2 & 0 & 0 \\ \hline
+Generating & 2 & 0 & 0 & 0 & 0 \\ \hline
+key        & 0 & 0 & 0 & 0 & 2 \\ \hline
+RSA        & 0 & 0 & 0 & 2 & 0 \\ \hline
+\end{tabularx}
+\end{minipage}
+\caption{Frekvenčná tabuľka pre algoritmus Nagappan-Vouk}
+\label{fig:nagappan}
+\end{figure}
+
+Algoritmus Nagappan-Vouk odhalí aj wildcard na poslednej pozícií, ale generuje prekývajúce sa clustre a v prípade málo frekventovaných správ neodhalí daný vzor. Algoritmus nepodporuje žiadnu formu, vstupných parametrov, ktorá by zlepšila výsledky.
+
+\subsection{IPLoM - Iterative partitioning log mining}
+Algoritmus IPLoM \parencite{iplom}  funguje odlišne od algoritmov popísaných vyššie. Pracuje na princípe hierarchického rozdeľovania logových správ na segmenty, kde na konci algoritmu listy v tejto hierarchickej štruktúre sú clustre z ktorých budú vytvorené parsovacie patterny. Algoritmus pracuje takto:
+
+\begin{enumerate}
+  \item Rozdelenie podľa počtu tokenov. Vychádza z predpokladu, že každá správa, ktorá bola vygenerovaná rovnakým patternom, bude mať rovnakú dĺžku. Každý segment teda obsahuje n-tice, kde n je počet tokenov v každej správe.
+  \item Rozdelenie podľa pozície tokenu. Pre každý segment nájdeme pozíciu tokenu, na ktorej segment obsahuje najmenej unikátnych hodnôt naprieč všetkými správami. Segment ďalej rozdelíme podľa hodnôt na nájdenej pozícii.
+  \item Rozdelenie podľa hľadania bijekcie. Pred samotným hľadaním bijekcie, sú zo segmentu odčlenené správy, ktoré podľa heuristiky \emph{cluster goodness treshold} už formujú dobrý cluster. Pre zvyšné správy nájdeme 2 rôzne pozície tokenov, ktoré obsahujú najviac unikátnych hodnôt. Hľadáme bijekciu medzi množinami tokenov na týchto 2 pozíciách. Ak bijekcia existuje, správy sú odčlenené do novej časti. Ak miesto bijekcie existuje vzťah \emph{1-N} alebo \emph{N-1}, použijeme heuristiku \emph{lower and upper treshold}. V prípade vzťahu \emph{N-M}, sú buď ignorované alebo ďalej rozdelené na vzťahy \emph{1-N}.
+  \item Formovanie clustrov. Každý finálny segment reprezentuje cluster. Pattern získame tak, že pozície tokenov s kardinalitou unikátnych hodnôt rovnou 1 považujeme za statickú časť a zvyšné pozície za dynamickú časť patternu.
+\end{enumerate}
+
+IPLom bol navrhnutý tak, aby našiel všetky parsovacie vzory v prvotnom behu bez nutnosti špecifikovať vstupné nastavenia. V skutočnosti ale podporuje 4 nastavenia, ktorými môžme obmedziť počet nájdených vzorov ako aj ich granularitu \parencite{nagappanvouk}.
+
+\subsection{Logcluster}
+
+Logcluster je algoritmus ktorý má vyriešiť známe nedostatky SLCT \parencite{logcluster}. Rovnako ako SLCT si všíma výskyt frekventovaných slov v správach, ale narozdiel od SLCT neberie do úvahy ich pozíciu. Vďaka tomu vie algoritmus priradiť do jedného clustru aj správy, ktoré nemajú rovnaký počet tokenov. Logcluster vezme vstupný parameter \emph{s}  a rozdelí správy do clustrov tak, aby v každom bolo aspoň \emph{s} správ. Ak je hodnota parametru \emph{s} určená zle, algoritmus produkuje buď príliš špecifické alebo príliš obecné parsovacie vzory. Autori preto dávajú odporúčanie ako tento paramter správne nastaviť. Algoritmus podporuje prácu s viacerými oddelovačmi slov, čo je v praktické použitie veľmi potrebné a považujeme to za veľkú výhodu \parencite{logclustertool}. Pre ešte lepšie výsledky algoritmus používa heuristiky \emph{aggregate \, support} a \emph{join cluster}. Vysledné parsovacie vzory používajú pre wildcard zápis v tvare \emph{*\{m,n\}}, napr. \emph{Generating *\{1,1\} bit RSA key}. Tento zápis označuje \emph{m} až \emph{n} tokenov oddelených delimitrom.
+
+
+\subsection{Nedostatky}
+Vyššie zmienené algoritmy SLCT, Nagappan-Vouk a IPLoM sú všetky založené na pozícií tokenu v správe. Z toho vyplýva, že nie sú schopné detekovať dynamickú časť parsovacieho vzoru, ktorá by sa skladala z viacerých tokenov. Ďalším nedostatkom týchto algoritmov je prekrývanie výsledných clustrov, ktoré by sa dalo odstrániť dodatočnou úpravou a spojením prekrývajúcich parsovacích vzorov. Logcluster síce tieto nedostatky nemá, ale správne nastavenie jeho heuristík môže byť náročná úloha.

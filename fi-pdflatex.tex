@@ -1,0 +1,94 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% I, the copyright holder of this work, release this work into the
+%% public domain. This applies worldwide. In some countries this may
+%% not be legally possible; if so: I grant anyone the right to use
+%% this work for any purpose, without any conditions, unless such
+%% conditions are required by law.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+  digital, %% This option enables the default options for the
+           %% digital version of a document. Replace with `printed`
+           %% to enable the default options for the printed version
+           %% of a document.
+  table,   %% Causes the coloring of tables. Replace with `notable`
+           %% to restore plain tables.
+  lof,     %% Prints the List of Figures. Replace with `nolof` to
+           %% hide the List of Figures.
+  lot,     %% Prints the List of Tables. Replace with `nolot` to
+           %% hide the List of Tables.
+  monochrome
+  %% More options are listed in the user guide at
+  %% <http://mirrors.ctan.org/macros/latex/contrib/fithesis/guide/mu/fi.pdf>.
+]{fithesis3}
+%% The following section sets up the locales used in the thesis.
+\usepackage[resetfonts]{cmap} %% We need to load the T2A font encoding
+\usepackage[T1,T2A]{fontenc}  %% to use the Cyrillic fonts with Russian texts.
+\usepackage[
+  main=slovak, %% By using `czech` or `slovak` as the main locale
+                %% instead of `english`, you can typeset the thesis
+                %% in either Czech or Slovak, respectively.
+  english %% The additional keys allow
+]{babel}        %% foreign texts to be typeset as follows:
+%%
+%%   \begin{otherlanguage}{german}  ... \end{otherlanguage}
+%%   \begin{otherlanguage}{russian} ... \end{otherlanguage}
+%%   \begin{otherlanguage}{czech}   ... \end{otherlanguage}
+%%   \begin{otherlanguage}{slovak}  ... \end{otherlanguage}
+%%
+%% For non-Latin scripts, it may be necessary to load additional
+%% fonts:
+\usepackage{paratype}
+\def\textrussian#1{{\usefont{T2A}{PTSerif-TLF}{m}{rm}#1}}
+%%
+%% The following section sets up the metadata of the thesis.
+\thesissetup{
+    date          = \the\year/\the\month/\the\day,
+    university    = mu,
+    faculty       = fi,
+    type          = mgr,
+    author        = Tomáš Márton,
+    gender        = m,
+    advisor       = RNDr. Daniel Tovarňák,
+    title         = {Interaktivní správa a odhalování parsovacích pravidel pro logovací data},
+    TeXtitle      = {Interaktivní správa a odhalování parsovacích pravidel pro logovací data},
+    keywords      = {Logovanie, Clustering, Frequent Pattern Mining, Extended Nagappan-Vouk},
+    TeXkeywords   = {Logovanie, Clustering, Frequent Pattern Mining, Extended Nagappan-Vouk},
+    bib           = ./thesis.bib,
+}
+\thesislong{abstract}{
+    Diplomová práca sa zaoberá odhaľovaním parsovacích vzorov systémových logov, konkrétne algoritmom Extended Nagappan-Vouk. Tento algoritmus vyhodnocuje a implementuje webové užíveteľské rozhranie pre tento algoritmus.
+}
+\thesislong{thanks}{
+Rád by som poďakoval RNDr. Danielovi Tovarňakovi, vedúcemu tejto diplomovej práce za vedenie a podnetné návrhy. Ďalej by som sa rád poďakoval svojej rodine a priateľom za podporu pri písaní tejto práce.
+}
+\usepackage{makeidx}      %% The `makeidx` package contains
+\makeindex                %% helper commands for index typesetting.
+%% These additional packages are used within the document:
+\usepackage{paralist} %% Compact list environments
+\usepackage{amsmath}  %% Mathematics
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{url}      %% Hyperlinks
+\usepackage{multirow} %% table multirow
+\usepackage{array} %% table cell vertical centering
+\usepackage{tabularx}
+\usepackage{listings}
+\begin{document}
+
+\include{introduction}
+\include{logging}
+\include{pattern-matching}
+\include{reviewed-clustering}
+
+
+
+ \printbibliography
+
+
+
+\appendix %% Start the appendices.
+\chapter{An appendix}
+Here you can insert the appendices of your thesis.
+
+\end{document}
