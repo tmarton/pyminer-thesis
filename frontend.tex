@@ -1,0 +1,84 @@
+\chapter{Klientská časť}
+Táto časť poskytuje užívateľské rozhranie, naviguje užívateľa v rámci aplikácie, reaguje na jeho akcie a komunikuje s vystaveným rozhraním servrovej časti aplikácie. Naimplementovaná je použitím frameworku Angular 2. Nejedná sa o tzv. single page ako je to bežné u aplikácií napísaných v tomto frameworku, ale je rozdelená na 3 stránky kde každá si drží svoj interný stav. Sú to stranký Miner, Mined Patterns a Regex Groups. Stránka Miner sa slúži na samotné odhaľovanie parsovacích vzorov. Stránky Mined Patterns a Regex Groups slúžia na prácu s finalizovanými parsovacími vzormi resp. sadami typov regulárnych výrazov, určených pre transformáciu vzorov.
+
+
+\section{Angular 2}
+Angular 2 je relativne nový komponentovo orientovaný javascriptový framework, ktorý odstraňuje nedostatky pôvodnej verzie. Aplikácie sa v Angulare 2 píšu buď v Typescripte alebo vo verziách ECMAScript 5 resp. 6. Ani jedna varianta zatiaľ nie je plne podporovaná dnešnými prehliadačmi, preto je nutná transkompilácia. My sme použili Typescript, nadstavbu javascriptu, ktorý zavádza statické typovanie a prvky objektovo orientovaného programovania ako typy, triedy, moduly a pod. čo považujeme za veľkú výhodu. Základné stavebné prvky sú
+
+\begin{enumerate}
+ \item Modul, zapuzdruje funkcionalitu ktorá vykonáva jednu úlohu. Funguje podobne ako OSGi modul, kde modul vidí len komponenty definované v samotnom module a komponenty ktoré modul explicitne importuje. Zároveň modul špecifikuje, ktoré komponenty budú viditeľné zvonka balíčka.
+ \item Komponenta, základny prvok aplikácie. Definuje aplikačnú logiku a interaguje so šablónou cez rozhranie vlastností a metód. Potrebná komfigurácia komponenty je zabezpečená cez metadáta
+ \item Šablóna, html stránka obohatená o značky z jazyka Angular. Definuje ako bude zobrazená komponenta. Zároveň obsahuje značkovanie pre prepojenie dát, ktoré určuje ako sú vymieňané data medzi komponentov a šablónov. V predošlej verzii Angularu sa vždy jednalo o obojsmerné prepojenie, čo spôsobovalo výkonnostné problémy. Vo verzii 2 si vieme toto prepojenie zašpecifikovať a vyhnúť sa tak týmto problémom.
+ \item Servisná služba, je to trieda, ktorá obsahuje funkcie na vykonanie špecifických úloh potrebných aplikáciou. 
+ \item Dependency injection je spôsob založený na rovnomenno návrhovom vzore ktorým Angular poskytuje servisným službám a komponentám závislosti.
+\end{enumerate}
+
+\subsection{Podporné nástroje}
+Aplikácie písané v Angulare 2 sú závislé na knižniciach tretích strán ako aj na knižniciach samotného Angularu. Na správu týchto závislostí používame všeobecne polulárny Node.js a jeho balíčkovací systém npm. Na správu kódu samotného používame Webpack, jednoduchý baličkovač zdrojových kódov. Webpack ponúka široké možnosti ako zdrojové kódy upraviť pred výsledým zabalením do archívu a zároveň možnosť vystaviť tieto kódy v rámci vývojového servra, čo sme pri vývoji vo veľkej miere využívali. V našom systéme Webpack pred výsledným zabalením zdrojové kódy minimalizuje a prevedie optimalizácie. Oba tieto nástroje sme ovládali a nastavovali cez nástroj Angular CLI, ktorý umožnuje vygenerovať si projekt už obsahujúci najčastejšiu konfiguráciu. 
+
+
+\subsection{Miner}
+Na začiatku je možné určiť aplikáciu z ktorej analyzované správy pochádzajú a jej verziu. Ďalej môžme určiť či chceme analyzovať správy z  logovacieho súboru ktorý nahrajeme alebo použijeme správy, ktoré už sú v systéme nahrané a neboli zatiaľ finálne analyzované.
+
+\begin{figure}[htbp]
+ \centering 
+ \begin{minipage}{0.95\linewidth}
+ 	\centering
+ 	\missingfigure[figheight=5cm]{Menu aplikacie}
+ 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ \end{minipage}
+  \caption{Trvanie eng.py }
+  \label{fig:eng-duration}
+\end{figure}
+
+Po tomto kroku máme pred sebou rozhranie, ktorým budeme upravovať a spúšťať analýzu. Po upresnení oddeľovačov a q-percentilu užívateľ spustí analýzu. Po obdržaní výsledkov je užívateľovi prezentovaná tabuľka, ktorej hlavnú časť tvoria navrhované parsovacie vzory. V tabuľke napravo je tlačidlo, ktorým užívateľ daný parsovací vzor potvrdí ako finálny. Pre potreby spresňujúcej analýzy je pri každom vzore vľavo checkbox. Pri označení ľubovoľného počtu navrhovaných vzorov a následnej analýze sú ako vstupné správy brané len tie, ktoré prislúchali k označeným vzorom. Výsledky spresňujúcej analýzy sú vložené do tabuľky tak, že novo navrhované parsovacie vzory sú pripojené ako potomkovia vzoru z ktorého vznikli a vytvárajú tak stromovú štruktúru. Tento proces vieme opakovať až kým nefinalizujeme všetky parsovacie vzory alebo sa možme rozhodnúť začat novú analýzu.
+
+\begin{figure}[htbp]
+ \centering 
+ \begin{minipage}{0.95\linewidth}
+ 	\centering
+ 	\missingfigure[figheight=5cm]{Zadavanie source}
+ 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ \end{minipage}
+  \caption{Trvanie eng.py }
+  \label{fig:eng-duration}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering 
+ \begin{minipage}{0.95\linewidth}
+ 	\centering
+ 	\missingfigure[figheight=5cm]{Proces analyzy}
+ 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ \end{minipage}
+  \caption{Trvanie eng.py }
+  \label{fig:eng-duration}
+\end{figure}
+
+\subsection{Mined patterns}
+Rozhranie prezentuje stránkovací zoznam finalizovaných parsovacích vzorov, ktoré je možné si vyfiltrovať podľa zdrojovej aplikácie a jej verzie. Aktuálny vyfiltrovaný zoznam si užívateľ vie exportovať do formátu REtrie. Zoznam ďalej umožnuje náhľad na správy, ktoré boli vygenerované použitím vybraného parsovacieho vzoru. 
+
+\begin{figure}[htbp]
+ \centering 
+ \begin{minipage}{0.95\linewidth}
+ 	\centering
+ 	\missingfigure[figheight=5cm]{Obrazok patternov}
+ 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ \end{minipage}
+  \caption{Trvanie eng.py }
+  \label{fig:eng-duration}
+\end{figure}
+
+\subsection{Regex Groups}
+Zobrazuje zoznam sád typov regulárnych výrazov, ktoré sú v aplikácií nahrané. V systéme sme prednastavili základnú sadu, ktorá by mala byť postačujúca pre značnú časť prípadov a táto sada nejde zo systému zmazať. Systém ďalej umožnuje nahrať novú sadu zo súboru vo formáte :
+
+ \begin{figure}[htbp]
+ \centering 
+ \begin{minipage}{0.95\linewidth}
+ 	\centering
+ 	\missingfigure[figheight=7cm]{Regex group}
+ 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ \end{minipage}
+  \caption{Trvanie eng.py }
+  \label{fig:eng-duration}
+\end{figure}
