@@ -1,19 +1,41 @@
 \chapter{Serverová časť}
 Hlavnou funkcionalitou tejto časti je obslúžiť požiadavky prichádzajúce ako http volania, spracovať ich a vrátiť výsledok vo formáte JSON. Backend sa teda priamo nestará o obslúženie užívateľských akcií a ani o routovanie, ale len odpovedá na volania od klienta. V REST API vystavujeme tieto metódy:
 
+\begin{figure}[htbp]
  \begin{minipage}{0.9\linewidth}
  	\centering
- 	\missingfigure[figheight=10cm]{tabulka rest api}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{|l|l|l|}
+\hline
+Metóda & \multicolumn{1}{c|}{Url}   & \multicolumn{1}{c|}{Akcia}                \\ \hline
+POST   & /api/task/                 & Spustí analýzu                            \\ \hline
+GET    & /api/task/\{pk\}/status/   & Vráti stav analýzy                        \\ \hline
+GET    & /api/patterns/             & Vráti parsovacie vzory                    \\ \hline
+POST   & /api/patterns/             & Finalizuje parsovací vzor                 \\ \hline
+DELETE & /api/patterns/\{pk\}/      & Zmaže vzor                                \\ \hline
+GET    & /api/patterns/\{pk\}/lines & Vráti správy parsovacieho vzoru           \\ \hline
+GET    & /api/export-patterns/      & Transformuje a exportuje parsovacie vzory \\ \hline
+GET    & /api/sources/              & Vráti zdroje zdroje správ                 \\ \hline
+GET    & /api/autocomplete/source   & Doplní názov zdroja správ                 \\ \hline
+GET    & /api/autocomplete/version  & Doplní verziu zdroja správ                \\ \hline
+GET    & /api/regex-groups/         & Vráti sady regulárnych výrazov            \\ \hline
+POST   & /api/regex-groups/         & Importuje sadu regulárnych výrazov        \\ \hline
+DELETE & /api/regex-groups/\{pk\}/  & Zmaže sadu regulárnych výrazov            \\ \hline
+\end{tabular}
  \end{minipage}
- 
+ \caption{Frekvenčná tabuľka pre algoritmus Nagappan-Vouk}
+\label{fig:nagappan}
+\end{figure}
+
 
 Pri implementácii sme sa intenzívne spoliehali na framework Django.
 \par Django obsahuje veľké množstvo modulov, z ktorých sme v našej práci síce využili len malú podmnožinu, ktorá nám ale zásadne zjednodušila celú implementáciu. Funkcionalita je rozdelená do samostatných súborov alebo modulov pre jednoduchý a prehľadný kód.
 
 \subsection{Django ORM}
 Pre prístup k dátam z databázy je v celej aplikácii použité objektovo-relačné mapovanie zakomponované priamo v Djangu.
-\par Využitie Django ORM vo väčšine prípadov vývojára úplne odprostí od potreby implementovať DAL -- Data Access Layer, čiže vrstvu pre prístup k dátam, ako je obvyklé napr. v jazykoch Java alebo C\#. Django ORM používa potomkov triedy \emph{django.db.models.Model}, ďalej nazývaných ako modely, na zadefinovanie štruktúry dát a pôsobí ako jediný prístupový bod k dátam. Každý model reprezentuje tabuľku v databáze a jeho objekt tohto typu jeden riadok v databáze. 
+\par Využitie Django ORM vo väčšine prípadov vývojára úplne odprostí od potreby implementovať DAL -- Data Access Layer, čiže vrstvu pre prístup k dátam, ako je obvyklé napr. v jazykoch Java alebo C\#. Django ORM používa potomkov triedy \emph{django.db.models.Model}, ďalej nazývaných ako modely, na zadefinovanie štruktúry dát a pôsobí ako jediný prístupový bod k dátam. Každý model reprezentuje tabuľku v databáze a jeho objekt tohto typu jeden riadok v databáze.
 
 \begin{figure}[htbp]
 \centering
@@ -28,28 +50,27 @@ class Source(models.Model):
         unique_together = ('source', 'version')
 \end{lstlisting} 		
 \end{minipage} 
-\caption{Databázový model typu Source}
+\caption{Django ORM model typu Source}
 \label{fig:static-analysis}
 \end{figure}
 
 \subsection{Django migrations}
-Na vytvorenie databázovej schémy používame Django migrations. 
+Na vytvorenie databázovej schémy používame Django migrations.
 \par Použitím Django migrations vývojári nemusia písať ddl scripty a modelujú schémy vytváraním tried v jazyku Python. Prvotná schéma je vygenerovaná automaticky, každá ďalšia zmena kódu spôsobí vygenerovanie novej migrácie, ktorá je následne aplikovaná na databázové tabuľky. Tento spôsob sa ukázal ako veľmi nápomocný v deployment scriptoch, kde jednoducho spustíme migráciu príkazom \emph{python manage.py migrate} a na vytvorenie schémy nepotrebujeme dodatočného sql klienta. Zároveň týmto spôsobom vieme do aplikácie vložiť aj iniciálne dáta.
 
 \subsection{Implementácia Extended Nagappan-Vouk}
 Implementácia sa snaží byť čo najrýchlejšia, preto používame knižnicu \emph{multiprocessing}. Väčšina vykonávaných metód najprv rozdelí problém na menšie časti, spočíta výsledok podproblému v novom procese a následne problém spojí. 
-\par Implementácia začína predspracovaním, v ktorom pre každú správu hľadáme sekvenčným prechodom cez už uložené parsovacie vzory ten správny. Ak nejaký existuje, daná správa je z ďalšieho spracovania vylúčená. Uznávame, že táto operácia nie je veľmi efektívna, ako už bolo zmienené v \ref{sec:data-mining} a s narastajúcim počtom uložených správ značne zhorší celkový čas spracovania, preto môže byť implementácia tejto operácie v budúcnosti jednoducho zameniteľná za riešenie založené na REtrie. 
+\par Implementácia začína predspracovaním, v ktorom pre každú správu hľadáme sekvenčným prechodom cez už uložené parsovacie vzory ten správny. Ak nejaký existuje, daná správa je z ďalšieho spracovania vylúčená. Uznávame, že táto operácia nie je veľmi efektívna, ako už bolo zmienené v \ref{sec:data-mining} a s narastajúcim počtom uložených správ značne zhorší celkový čas spracovania, preto môže byť implementácia tejto operácie v budúcnosti jednoducho zameniteľná za riešenie založené na REtrie.
 \par Ďalej nasleduje samotný beh algoritmu, ktorého výsledky sú uložené do Redisu. Za návratoú hodnotu je použitý objekt, ktorý obsahuje štatistiku vytvorenú z týchto výsledkov a textovú reprezentáciu parsovacích vzorov.
 
 \begin{figure}[htbp]
  \centering 
  \begin{minipage}{0.95\linewidth}
  	\centering
- 	\missingfigure[figheight=10cm]{diagram komponent}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ 	\includegraphics[width=\textwidth]{Images/thesis-erd.pdf}
  \end{minipage}
-  \caption{ERD diagram vzorov}
-  \label{fig:erd-patterns}
+  \caption{ERD diagram}
+  \label{fig:use-cases}
 \end{figure}
 
 \subsection{Prevod medzi formátmi parsovacích vzorov}
@@ -103,11 +124,11 @@ def build_pattern_types_tab(pattern, pattern_lines, regex_types):
     return pattern_types
 \end{lstlisting} 		
 \end{minipage} 
-\caption{Databázovy model typu Source}
+\caption{Algoritmus transformácie parsovacieho vzoru na REtrie formát}
 \label{fig:pattern-transformation}
 \end{figure}
 
-Hlavný rozdiel medzi popisovanými formátmi je ten, že pokým nativný formát algoritmu Extended Naggap-Vouk skracuje výskyt viacerých parametrov v rade, REtrie formát tento zápis nepozná. Preto vo výsledku z jedného parsovacieho vzoru môže vzniknúť až 
+Hlavný rozdiel medzi popisovanými formátmi je ten, že pokým nativný formát algoritmu Extended Naggap-Vouk skracuje výskyt viacerých parametrov v rade, REtrie formát tento zápis nepozná. Preto vo výsledku z jedného parsovacieho vzoru môže vzniknúť až
 
 \begin{align*}
 \prod_{group \in groups} group.upper\_bound - group.lower\_bound

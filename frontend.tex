@@ -10,67 +10,53 @@ Angular 2 je relatívne nový komponentovo-orientovaný JavaScriptový framework
  \item Modul -- zpuzdruje funkcionalitu, ktorá vykonáva jednu úlohu. Funguje podobne ako OSGi modul, kde modul vidí len komponenty definované v samotnom module a komponenty, ktoré modul explicitne importuje. Zároveň modul špecifikuje, ktoré komponenty budú viditeľné zvonku balíčka.
  \item Komponent -- základný prvok aplikácie. Definuje aplikačnú logiku a interaguje so šablónou cez rozhranie vlastností a metód. Potrebná komfigurácia komponenty je zabezpečená cez metadáta.
  \item Šablóna -- html stránka obohatená o značky z jazyka Angular. Definuje, ako bude zobrazený komponent. Zároveň obsahuje značkovanie pre prepojenie dát, ktoré určuje, ako sú vymieňané dáta medzi komponentom a šablónou. V predošlej verzii Angularu sa vždy jednalo o obojsmerné prepojenie, čo spôsobovalo výkonnostné problémy. Vo verzii 2 si vieme toto prepojenie zašpecifikovať a vyhnúť sa tak týmto problémom.
- \item Servisná služba -- trieda, ktorá obsahuje funkcie na vykonanie špecifických úloh potrebných aplikáciou. 
+ \item Servisná služba -- trieda, ktorá obsahuje funkcie na vykonanie špecifických úloh potrebných aplikáciou.
  \item Dependency injection -- spôsob založený na rovnomennom návrhovom vzore, ktorým Angular poskytuje servisným službám a komponentom závislosti.
 \end{enumerate}
 
 \subsection{Podporné nástroje}
-Aplikácie písané v Angular 2 sú závislé na knižniciach tretích strán ako aj na knižniciach samotného Angularu. 
+Aplikácie písané v Angular 2 sú závislé na knižniciach tretích strán ako aj na knižniciach samotného Angularu.
 \par Na správu týchto závislostí používame všeobecne polulárny Node.js a jeho balíčkovací systém npm, zatiaľ čo na správu samotného kódu používame Webpack, jednoduchý balíčkovač zdrojových kódov. Webpack ponúka široké možnosti, ako zdrojové kódy upraviť pred výsledným zabalením do archívu a zároveň možnosť vystaviť tieto kódy v rámci vývojového servera, čo sme pri vývoji vo veľkej miere využívali. V našom systéme Webpack pred výsledným zabalením zdrojové kódy minimalizuje a prevedie optimalizácie.
-\par Oba tieto nástroje sme ovládali a nastavovali cez nástroj Angular CLI, ktorý umožnuje vygenerovať si projekt už obsahujúci najčastejšiu konfiguráciu. 
+\par Oba tieto nástroje sme ovládali a nastavovali cez nástroj Angular CLI, ktorý umožnuje vygenerovať si projekt už obsahujúci najčastejšiu konfiguráciu.
 
 
 \subsection{Miner}
-Na začiatku je možné určiť aplikáciu, z ktorej analyzované správy pochádzajú, a jej verziu. Ďalej môžeme určiť, či chceme analyzovať správy z logovacieho súboru, ktorý nahrajeme, alebo použijeme správy, ktoré už sú v systéme nahrané a neboli zatiaľ finálne analyzované.
+Na začiatku je možné určiť aplikáciu, z ktorej analyzované správy pochádzajú, a jej verziu, ako môžeme vidieť na obr. \ref{fig:miner-source}. Ďalej môžeme určiť, či chceme analyzovať správy z logovacieho súboru, ktorý nahrajeme, alebo použijeme správy, ktoré už sú v systéme nahrané a neboli zatiaľ finálne analyzované.
 
 \begin{figure}[htbp]
  \centering 
  \begin{minipage}{0.95\linewidth}
  	\centering
- 	\missingfigure[figheight=5cm]{Menu aplikacie}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ 	\includegraphics[width=\textwidth]{Images/thesis-miner-source.png}
  \end{minipage}
-  \caption{Trvanie eng.py }
-  \label{fig:eng-duration}
+  \caption{Špecifikovanie zdrojovej aplikácie pre potreby analýzy. Vstupné polia sú umiestnené pod sebou, ako reakcia na šírku okna v responzívnom dizajne.}
+  \label{fig:miner-source}
 \end{figure}
 
-Po tomto kroku máme pred sebou rozhranie, ktorým budeme upravovať a spúšťať analýzu. 
+Po tomto kroku máme pred sebou rozhranie, ktorým budeme upravovať a spúšťať analýzu.
 \par Po upresnení oddeľovačov a q-percentilu užívateľ spustí analýzu. Po obdržaní výsledkov je užívateľovi prezentovaná tabuľka, ktorej hlavnú časť tvoria navrhované parsovacie vzory. V tabuľke napravo je tlačidlo, ktorým užívateľ daný parsovací vzor potvrdí ako finálny. Pre potreby spresňujúcej analýzy je pri každom vzore vľavo checkbox. Pri označení ľubovoľného počtu navrhovaných vzorov a následnej analýze sú ako vstupné správy brané len tie, ktoré prislúchali k označeným vzorom. Výsledky spresňujúcej analýzy sú vložené do tabuľky tak, že novo navrhované parsovacie vzory sú pripojené ako potomkovia vzoru, z ktorého vznikli, a vytvárajú tak stromovú štruktúru. Tento proces vieme opakovať, až kým nefinalizujeme všetky parsovacie vzory, alebo sa môžeme rozhodnúť pre začatie novej analýzy.
 
 \begin{figure}[htbp]
  \centering 
  \begin{minipage}{0.95\linewidth}
  	\centering
- 	\missingfigure[figheight=5cm]{Zadavanie source}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ 	\includegraphics[width=\textwidth]{Images/thesis-miner-analysis.png}
  \end{minipage}
-  \caption{Trvanie eng.py }
-  \label{fig:eng-duration}
-\end{figure}
-
-\begin{figure}[htbp]
- \centering 
- \begin{minipage}{0.95\linewidth}
- 	\centering
- 	\missingfigure[figheight=5cm]{Proces analyzy}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
- \end{minipage}
-  \caption{Trvanie eng.py }
-  \label{fig:eng-duration}
+  \caption{Priebeh analýzy logovacích správ.}
+  \label{fig:miner-source}
 \end{figure}
 
 \subsection{Mined patterns}
-Rozhranie prezentuje stránkovací zoznam finalizovaných parsovacích vzorov, ktoré si je možné vyfiltrovať podľa zdrojovej aplikácie a jej verzie. Aktuálny vyfiltrovaný zoznam si užívateľ vie exportovať do formátu REtrie. Zoznam ďalej umožnuje náhľad na správy, ktoré boli vygenerované použitím vybraného parsovacieho vzoru. 
+Rozhranie prezentuje stránkovací zoznam finalizovaných parsovacích vzorov, ktoré si je možné vyfiltrovať podľa zdrojovej aplikácie a jej verzie ako vidíme na obrázku \ref{fig:pattern}. Aktuálny vyfiltrovaný zoznam si užívateľ vie exportovať do formátu REtrie. Zoznam ďalej umožnuje náhľad na správy, ktoré boli vygenerované použitím vybraného parsovacieho vzoru.
 
 \begin{figure}[htbp]
  \centering 
  \begin{minipage}{0.95\linewidth}
  	\centering
- 	\missingfigure[figheight=5cm]{Obrazok patternov}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ 	\includegraphics[width=\textwidth]{Images/thesis-pattern.png}
  \end{minipage}
-  \caption{Trvanie eng.py }
-  \label{fig:eng-duration}
+  \caption{Správa uložených parsovacích vzorov.}
+  \label{fig:pattern}
 \end{figure}
 
 \subsection{Regex Groups}
@@ -80,9 +66,8 @@ Zobrazuje zoznam sád typov regulárnych výrazov, ktoré sú v aplikácií nahr
  \centering 
  \begin{minipage}{0.95\linewidth}
  	\centering
- 	\missingfigure[figheight=7cm]{Regex group}
- 	%\includegraphics[width=\textwidth]{images/RURC.png} 	
+ 	\includegraphics[width=\textwidth]{Images/thesis-groups.png}
  \end{minipage}
-  \caption{Trvanie eng.py }
-  \label{fig:eng-duration}
+  \caption{Importovanie novej skupiny a aktuálny zoznam.}
+  \label{fig:groups}
 \end{figure}
