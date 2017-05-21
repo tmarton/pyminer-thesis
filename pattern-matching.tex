@@ -5,9 +5,8 @@ Odhaľovanie parsovacích vzorov sa s rozšírením distibuovaných sytémov a c
 \section{Analýza zdrojových kódov}
 
 Analýza zdrojových kódov predstavuje pomerne presnú metódu, kde za pomoci statickej analýzy vieme vo väčšine prípadov odhaliť všetky parsovacie vzory.
-Rôzne programovacie jazyky ale používajú rôzny štýl logovania -- programovací jazyk C napr. používa volanie funkcie \emph{printf}.
-V tomto prípade sa snažíme nájsť volania tejto funkcie a zároveň odvodiť typy parametrov.
-Pre objektovo orientované jazyky je situácia trochu komplikovanejšia, ako môžeme vidieť na obr. \ref{fig:static-analysis}. Po prvé, vo väčšine prípadov používajú nejakú logovaciu abstrakciu a jej rozhranie, ktoré musíme identifikovať. Po druhé, keďže v objektovo orientovanom programovaní sa na výpis reprezentácie objektu používa metóda \emph{toString}, nájdené parsovacie vzory sú neúplné a je nutné ďalej rekurzívne investigovať metódu \emph{toString} na všetkych parametroch nájdeného parsovacieho vzoru.
+\par Rôzne programovacie jazyky ale používajú rôzny štýl logovania -- programovací jazyk C napr. používa volanie funkcie \emph{printf}.
+V tomto prípade sa snažíme nájsť volania tejto funkcie a zároveň odvodiť typy parametrov. Pre objektovo orientované jazyky je situácia trochu komplikovanejšia, ako môžeme vidieť na obr. \ref{fig:static-analysis}. Po prvé, vo väčšine prípadov používajú nejakú logovaciu abstrakciu a jej rozhranie, ktoré musíme identifikovať. Po druhé, keďže v objektovo orientovanom programovaní sa na výpis reprezentácie objektu používa metóda \emph{toString}, nájdené parsovacie vzory sú neúplné a je nutné ďalej rekurzívne investigovať metódu \emph{toString} na všetkych parametroch nájdeného parsovacieho vzoru.
 
 \begin{figure}[htbp]
 \centering
@@ -46,10 +45,12 @@ Clustrovanie vieme popísať ako hľadanie rozdelenia logovacích správ do kone
   \item možnosť ignorovať poradie
 \end{enumerate}
 
-Z tohto dôvodu nie je zrejmé, ako merať podobnosť logovacích správ tradičnými algoritmami, aj keď existuje niekoľko známych funkcií ako napr. Hammingova vzdialenosť alebo Jaccardov koeficient \parencite{slct}. Spôsobov, podľa ktorých možno jednotlivé clustre vytvárať, je niekoľko, a každý algoritmus používa svoj postup, ako si ukážeme ďalej. Najprv si ale pre nasledujúcu časť zadefinujeme pojmy, ktoré budeme používať pri popise algoritmov. Logovací súbor budeme nazývať dataset, jeho jednotlivé riadky budeme považovať za správy, ktorých každé slovo bude reprezentovať jeden token. Kvôli všeobecne zaužívanej konvencii budeme dynamickú časť nájdeného parsovacieho vzoru označovať ako wildcard a v samotnom vzore ho budeme nahradzovať znakom \emph{*}.
+Z tohto dôvodu nie je zrejmé, ako merať podobnosť logovacích správ tradičnými algoritmami, aj keď existuje niekoľko známych funkcií ako napr. Hammingova vzdialenosť alebo Jaccardov koeficient \parencite{slct}. Spôsobov, podľa ktorých možno jednotlivé clustre vytvárať, je niekoľko, a každý algoritmus používa svoj postup, ako si ukážeme ďalej. 
+\par Najprv si ale pre nasledujúcu časť zadefinujeme pojmy, ktoré budeme používať pri popise algoritmov. Logovací súbor budeme nazývať dataset, jeho jednotlivé riadky budeme považovať za správy, ktorých každé slovo bude reprezentovať jeden token. Kvôli všeobecne zaužívanej konvencii budeme dynamickú časť nájdeného parsovacieho vzoru označovať ako wildcard a v samotnom vzore ho budeme nahradzovať znakom \emph{*}.
 
 \subsection{SLCT -- Simple Logfile Clustering Tool}
-Tvorca SLCT \parencite{slct, slctloghound} si všíma dve kľúčové vlastnosti logovacích súborov, o ktoré sa opieral pri tvorbe algoritmu. Prvou vlastnosťou je, že väčšina slov sa v datasete nevyskytuje často a nezanedbateľná časť dokonca len raz. Druhá vlastnosť hovorí, že medzi slovami, ktoré sa vyskytujú často, je silná korelácia. Neformálne povedané -- často sa vyskytujúce slová tvoria statickú časť a zvyšné slová dynamickú časť logovacej správy. Algoritmus na vstupe očakáva hraničnú hodnotu N, podľa ktorej určí, či bude dané slovo považované za statickú alebo dynamickú časť. 
+Tvorca SLCT \parencite{slct, slctloghound} si všíma dve kľúčové vlastnosti logovacích súborov, o ktoré sa opieral pri tvorbe algoritmu. \par Prvou vlastnosťou je, že väčšina slov sa v datasete nevyskytuje často a nezanedbateľná časť dokonca len raz. Druhá vlastnosť hovorí, že medzi slovami, ktoré sa vyskytujú často, je silná korelácia. Neformálne povedané -- často vyskytujúce sa slová tvoria statickú časť a zvyšné slová dynamickú časť logovacej správy. 
+\par Algoritmus na vstupe očakáva hraničnú hodnotu N, podľa ktorej určí, či bude dané slovo považované za statickú alebo dynamickú časť. 
 \par SLCT pracuje v nasledujúcich troch krokoch:
 
 \begin{enumerate}
@@ -58,10 +59,12 @@ Tvorca SLCT \parencite{slct, slctloghound} si všíma dve kľúčové vlastnosti
   \item Ak sa kandidátna množina nachádza v logovacom súbore častejšie ako hraničná hodnota N, potom je zvolený cluster. Ten je vytvorený doplnením wildcard za chýbajúce pozície v riadku, takže vysledný pattern vyzerá takto \emph{Generating * bit RSA key}.
 \end{enumerate}
 
-Riadky, ktoré nepatria k žiadnemu clustru, tvoria špeciálny cluster nazývaný outliers. Všimnime si, že algoritmus vôbec nezaznamenáva pozície medzier ani počet tokenov v pôvodnej správe. Preto SLCT kvôli spôsobu, akým tvorí clustre, nevie odhaliť wildcard na konci riadku. Vezmime si napr. kandidátnu množinu $\{(1,Illegal), (2,user), (4,from)\} $. SLCT vytvorí pattern \emph{Illegal user * from}. Správny pattern by mal vyzerať takto  \emph{Illegal user * from *}.
+Riadky, ktoré nepatria k žiadnemu clustru, tvoria špeciálny cluster nazývaný outliers. Všimnime si, že algoritmus vôbec nezaznamenáva pozície medzier ani počet tokenov v pôvodnej správe. Preto SLCT kvôli spôsobu, akým tvorí clustre, nevie odhaliť wildcard na konci riadku. 
+\par Vezmime si napr. kandidátnu množinu $\{(1,Illegal), (2,user), (4,from)\} $. SLCT vytvorí pattern \emph{Illegal user * from}. Správny pattern by mal vyzerať takto  \emph{Illegal user * from *}.
 
 \subsection{Naggapan-Vouk algoritmus}
-Kľúčová vlastnosť, na ktorej Naggapan a Vouk postavili ich algoritmus \parencite{nagappanvouk}, je skutočnosť, že keď sa konkrétny pattern nachádza v datasete na viacerých miestach s rôznymi parametrami, jeho statická časť sa bude vyskytovať vo väčšine prípadov, ale dynamická časť len párkrát. Z tohto dôvodu Nagappan-Vouk buduje tabuľku frekvencií, ako vidíme na obr. \ref{fig:nagappan}. Priebeh algoritmu:
+Kľúčová vlastnosť, na ktorej Naggapan a Vouk postavili ich algoritmus \parencite{nagappanvouk}, je skutočnosť, že keď sa konkrétny pattern nachádza v datasete na viacerých miestach s rôznymi parametrami, jeho statická časť sa bude vyskytovať vo väčšine prípadov, ale dynamická časť len párkrát. Z tohto dôvodu Nagappan-Vouk buduje tabuľku frekvencií, ako vidíme na obr. \ref{fig:nagappan}. 
+\par Priebeh algoritmu:
 
 \begin{enumerate}
   \item Vybudujeme si frekvenčnú tabuľku, ktorá obsahuje informáciu, koľkokrát sa dané slovo nachádza na konkrétnej pozícií v datasete. Neformálne povedané, riadky predstavujú tokeny a stĺpce pozície, na ktorých sa token nachádza.
@@ -104,8 +107,12 @@ IPLoM bol navrhnutý tak, aby našiel všetky parsovacie vzory v prvotnom behu b
 
 \subsection{Logcluster}
 
-Logcluster je algoritmus, ktorý má vyriešiť známe nedostatky SLCT \parencite{logcluster}. Rovnako ako SLCT si všíma výskyt frekventovaných slov v správach, ale na rozdiel od SLCT neberie do úvahy ich pozíciu. Vďaka tomu vie algoritmus priradiť do jedného clustru aj správy, ktoré nemajú rovnaký počet tokenov. Logcluster vezme vstupný parameter \emph{s} a rozdelí správy do clustrov tak, aby v každom bolo aspoň \emph{s} správ. Ak je hodnota parametru \emph{s} určená zle, algoritmus produkuje buď príliš špecifické alebo príliš všebecné parsovacie vzory. Autori preto dávajú odporúčanie, ako tento paramter správne nastaviť. Algoritmus podporuje prácu s viacerými oddeľovačmi slov, čo je v praktickom použití veľmi potrebné a považujeme to za veľkú výhodu \parencite{logclustertool}. Pre ešte lepšie výsledky algoritmus používa heuristiky \emph{aggregate\, support} a \emph{join cluster}. Vysledné parsovacie vzory používajú pre wildcard zápis v tvare \emph{*\{m,n\}}, napr. \emph{Generating *\{1,1\} bit RSA key}. Tento zápis označuje \emph{m} až \emph{n} tokenov oddelených delimitrom.
+Logcluster je algoritmus, ktorý má vyriešiť známe nedostatky SLCT \parencite{logcluster}. 
+\par Rovnako ako SLCT si všíma výskyt frekventovaných slov v správach, ale na rozdiel od SLCT neberie do úvahy ich pozíciu. Vďaka tomu vie algoritmus priradiť do jedného clustru aj správy, ktoré nemajú rovnaký počet tokenov. 
+\par Logcluster vezme vstupný parameter \emph{s} a rozdelí správy do clustrov tak, aby v každom bolo aspoň \emph{s} správ. Ak je hodnota parametru \emph{s} určená zle, algoritmus produkuje buď príliš špecifické alebo príliš všebecné parsovacie vzory. Autori preto dávajú odporúčanie, ako tento paramter správne nastaviť. 
+\par Algoritmus podporuje prácu s viacerými oddeľovačmi slov, čo je v praktickom použití veľmi potrebné a považujeme to za veľkú výhodu \parencite{logclustertool}. Pre ešte lepšie výsledky algoritmus používa heuristiky \emph{aggregate\, support} a \emph{join cluster}. Vysledné parsovacie vzory používajú pre wildcard zápis v tvare \emph{*\{m,n\}}, napr. \emph{Generating *\{1,1\} bit RSA key}. Tento zápis označuje \emph{m} až \emph{n} tokenov oddelených delimitrom.
 
 
 \subsection{Nedostatky}
-Všetky vyššie zmienené algoritmy -- SLCT, Nagappan-Vouk a IPLoM, sú založené na pozícii tokenu v správe. Z toho vyplýva, že nie sú schopné detegovať dynamickú časť parsovacieho vzoru, ktorá by sa skladala z viacerých tokenov. Ďalším nedostatkom týchto algoritmov je prekrývanie výsledných clustrov, ktoré by sa dalo odstrániť dodatočnou úpravou a spojením prekrývajúcich parsovacích vzorov. Logcluster síce tieto nedostatky nemá, ale správne nastavenie jeho heuristík môže byť náročná úloha.
+Všetky vyššie zmienené algoritmy -- SLCT, Nagappan-Vouk a IPLoM, sú založené na pozícii tokenu v správe. Z toho vyplýva, že nie sú schopné detegovať dynamickú časť parsovacieho vzoru, ktorá by sa skladala z viacerých tokenov. 
+\par Ďalším nedostatkom týchto algoritmov je prekrývanie výsledných clustrov, ktoré by sa dalo odstrániť dodatočnou úpravou a spojením prekrývajúcich parsovacích vzorov. Logcluster síce tieto nedostatky nemá, ale správne nastavenie jeho heuristík môže byť náročná úloha.

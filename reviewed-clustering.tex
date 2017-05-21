@@ -19,7 +19,9 @@ V závislosti od vyššie zmienených nastavení dostaneme parsovacie vzory, kto
 
 \section{RURC -- Recursive User-Reviewed Clustering}
 \label{sec:rurc}
-Z hore uvedeného rozboru vyplýva, že ideálny algoritmus by mal zahrňovať určitý stupeň užívateľskej interakcie a mal by vedieť pracovať aj nad vybranou podmnožinou daného datasetu. Vedúci práce, RNDr. Daniel Tovarňák, preto v \parencite{Tovarnak2017} navrhol systematický postup nazvaný \emph{Recursive User-Reviewed Clustering} znázornený na obr. \ref{fig:rurc}. Výsledkom je proces, pri ktorom užívateľ rekurzívne spúšťa algoritmus nad datasetom, pričom v každom priebehu má možnosť potvrdiť finálne parsovacie vzory a odfiltrovať z datasetu správy, ktoré k nim patria. Tento proces prebieha v nasledujúcich krokoch:
+Z hore uvedeného rozboru vyplýva, že ideálny algoritmus by mal zahrňovať určitý stupeň užívateľskej interakcie a mal by vedieť pracovať aj nad vybranou podmnožinou daného datasetu. 
+\par Vedúci práce, RNDr. Daniel Tovarňák, preto v \parencite{Tovarnak2017} navrhol systematický postup nazvaný \emph{Recursive User-Reviewed Clustering} znázornený na obr. \ref{fig:rurc}. Výsledkom je proces, pri ktorom užívateľ rekurzívne spúšťa algoritmus nad datasetom, pričom v každom priebehu má možnosť potvrdiť finálne parsovacie vzory a odfiltrovať z datasetu správy, ktoré k nim patria. 
+\par Tento proces prebieha v nasledujúcich krokoch:
 
 \begin{enumerate}
   \item Odstránenie správ z datasetu, ktoré prislúchajú k už odhaleným parsovacím vzorom.
@@ -48,7 +50,7 @@ Z hore uvedeného rozboru vyplýva, že ideálny algoritmus by mal zahrňovať u
 \label{sec:eng}
 RURC definuje všeobecné princípy analýzy logovacích súborov, avšak nešpecifikuje algoritmus, ktorý má byť použitý na clustrovanie správ.
 Z nedostatkov zmienených v predchádzajúcej kapitole ale vyplýva, že žiaden algoritmus okrem LogCluster sa nehodí na použitie v RURC.
-RNDr. Daniel Tovarňák preto vyvinul algoritmus Extended Nagappan-Vouk určený pre použitie v RURC, ktorý bude spĺnať všetky požiadavky RURC a zároveň bude jednoduchšie nastaviteľný ako LogCluster. Algoritmus produkuje parsovacie vzory vo formáte, ktorý popisuje paramter ako \emph{\%\{m,n\}} $\%\{m,n\}$. Podobne ako pri LogClustry to označuje \emph{m} až \emph{n} za sebou idúcich tokenov. Napr. parsovací vzor \emph{Software caused \%\{1,3\}} zachytí správu ktorá obsahuje text \emph{Software caused} nasledovaný 1 až 3 slovami oddelenými medzerou. Postup algoritmu:
+\par RNDr. Daniel Tovarňák preto vyvinul algoritmus Extended Nagappan-Vouk určený pre použitie v RURC, ktorý bude spĺnať všetky požiadavky RURC a zároveň bude jednoduchšie nastaviteľný ako LogCluster. Algoritmus produkuje parsovacie vzory vo formáte, ktorý popisuje paramter ako \emph{\%\{m,n\}} $\%\{m,n\}$. Podobne ako pri LogClustry to označuje \emph{m} až \emph{n} za sebou idúcich tokenov. Napr. parsovací vzor \emph{Software caused \%\{1,3\}} zachytí správu ktorá obsahuje text \emph{Software caused} nasledovaný 1 až 3 slovami oddelenými medzerou. \par Postup algoritmu:
 
 \begin{enumerate}
  \item Správy sa rozdelia na tokeny na základe užívateľom zadaných oddeľovačov slov.
@@ -62,8 +64,9 @@ RNDr. Daniel Tovarňák preto vyvinul algoritmus Extended Nagappan-Vouk určený
 \subsection{Data mining}
 \label{sec:data-mining}
 Ako sme spomenuli v sekcii \ref{sec:eng}, Extended Nagappan-Vouk produkuje parametre vzoru vo formáte \emph{\%\{m,n\}}. Výsledný parsovací vzor je teda kompaktný a užívateľsky čitateľný.  Tento formát vieme ďalej jednoduchou úpravou previesť na regulárny výraz, používaný štandardnými knižnicami.
-\par Po odhalení všetkých parsovacích vzorov, väčšinou príde na rad data mining, tz. extrahujeme pre každú logovaciu správu parametre jej parsovacieho vzoru. To vykonáme nájdením jej parsovacieho vzoru a vrátením zachytených skupín regulárneho výrazu. Triviálny, ale často používaný postup je iterovať cez všetky vzory až kým sa nenájde zhoda. V najhoršom prípade to znamená prejsť celú množinu vzorov. Takýto prístup je ale neefektívny a môže spôsobovať výkonnostné problémy. 
-\par Kvôli odstránenie vyššie zmienených problémov, Tovarňak v \parencite{regextrie} navrhol stromovú štruktúru Regex Trie - REtrie a algoritmus, ktorý v danej štuktúre nájde príslušný parsovací vzor so zložitosťou $\mathcal{O}(t)$, kde $t$ je počet tokenov v správe. REtrie akceptuje parsovacie vzory vo formáte YAML súboru:
+\par Po odhalení všetkých parsovacích vzorov, väčšinou príde na rad data mining, tzn. pre každú logovaciu správu extrahujeme parametre jej parsovacieho vzoru. To vykonáme nájdením jej parsovacieho vzoru a vrátením zachytených skupín regulárneho výrazu. Triviálny, ale často používaný postup je iterovať cez všetky vzory až kým sa nenájde zhoda. V najhoršom prípade to znamená prejsť celú množinu vzorov. Takýto prístup je ale neefektívny a môže spôsobovať výkonnostné problémy. 
+\par Kvôli odstráneniu vyššie zmienených problémov, RNDr. Daniel Tovarňák v \parencite{regextrie} navrhol stromovú štruktúru Regex Trie - REtrie a algoritmus, ktorý v danej štuktúre nájde príslušný parsovací vzor so zložitosťou $\mathcal{O}(t)$, kde $t$ je počet tokenov v správe. 
+\par REtrie akceptuje parsovacie vzory vo formáte YAML súboru:
 
 \begin{figure}[h]
 \centering
@@ -83,7 +86,8 @@ patterns:
 \end{minipage} 
 \end{figure}
 
-Pod kľúčom regexps je zoznam typov regulárnych výrazov. Každý takýto typ sa skladá z mena, dátového typu a samotného regulárneho výrazu. Kľúč patterns obsahuje parsovacie vzory, ktoré sú združené pod ľubovoľným identifikátorom skupiny vzorov. Parameter parsovacieho vzoru sa potom skladá z odkazu na typ regulárneho výrazu a mena. Aby sme mohli ťažiť z tohto prístupu, výsledný systém musí vedieť zvládnuť konverziu medzi prezentovanými formátmi parsovacích vzorov.
+Pod kľúčom regexps je zoznam typov regulárnych výrazov. Každý takýto typ sa skladá z mena, dátového typu a samotného regulárneho výrazu. Kľúč patterns obsahuje parsovacie vzory, ktoré sú združené pod ľubovoľným identifikátorom skupiny vzorov. 
+\par Parameter parsovacieho vzoru sa potom skladá z odkazu na typ regulárneho výrazu a mena. Aby sme mohli ťažiť z tohto prístupu, výsledný systém musí vedieť zvládnuť konverziu medzi prezentovanými formátmi parsovacích vzorov.
 
 
 \begin{figure}[htbp]
