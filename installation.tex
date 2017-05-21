@@ -1,0 +1,14 @@
+\chapter{Inštalácia a nasadenie}
+Implementovaná aplikácia používa len voľne dostupné knižnice a nástroje, ktoré sú schopné bežat na všetkých majoritných operačných systémoch. Predpokladáme ale, že aplikácia bude hlavne nasadená na linuxový server ako je to bežné. Preto sme vytvorili scripty, ktoré by mali administrátorovi pomôcť automatizovať proces nasadenia na linuxový server RHEL len za použitia nevyhnutne minimálnej konfigurácie. Použili sme pritom python virtuálne prostredie, konzolové nástroje Fabric a Ansible.
+
+\section{Príprava prostredia}
+V tejto fáze si aktivujeme python virtuálne prostredie a prostredníctvom pip balíčkovacieho manažéra si nainštalujeme Fabric.
+Fabric je nástroj, ktorý nám dovolí písaním python kódu volať služby operačného systému. Týmto spôsobom: 
+
+\begin{enumerate}
+  \item Vygenerujeme ssh kľúče
+  \item Prihlásime sa na cieľový systém a updatujeme ho
+  \item Vytvoríme užívateľa a skupinu pod ktorou bude bežať naša aplikácia
+  \item Nahrajeme vygenerované ssh kľúče
+  \item Upgradujeme server a nainštalujeme závislosti pre Ansible
+\end{enumerate}
