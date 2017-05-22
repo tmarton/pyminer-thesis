@@ -1,5 +1,5 @@
 \chapter{Vyhodnotenie Extended Nagappan-Vouk}
-Navrhnutý algoritmus adresuje nedostatky už existujúch algoritmov a odstraňuje ich, ale aby bol skutočne použiteľný je potrebné, aby všeobecne dosahoval presné výsledky a  zvládal pracovať aj z vačším množstvom dát. Ďalej nás bude zaujímať, či vieme ešte viac spresniť jeho výsledky predspracovaním logovacích správ a ako takýto preprocesing ovplyvní výkonnosť algoritmu. Ďalej preto budeme skúmať tieto otázky:
+Navrhnutý algoritmus adresuje nedostatky už existujúch algoritmov a odstraňuje ich, ale aby bol skutočne použiteľný je potrebné, aby dosahoval  všeobecne presné výsledky a zvládal pracovať aj s vačším množstvom dát. Ďalej nás bude zaujímať, či vieme ešte viac spresniť jeho výsledky predspracovaním logovacích správ a ako takýto preprocesing ovplyvní výkonnosť algoritmu. Preto budeme skúmať tieto otázky:
 
 \begin{enumerate}
   \item Aká je presnosť algoritmu Extended Nagappan-Vouk na reálnych dátach ?
@@ -7,10 +7,10 @@ Navrhnutý algoritmus adresuje nedostatky už existujúch algoritmov a odstraňu
   \item Vieme zlepšiť presnosť algoritmu predspracovaním vstupných správ ? Ovplyvní to výkonnosť algoritmu ?
 \end{enumerate}
 
-Ako základ pre naše vyhodnotenie sme použili štúdiu \parencite{he2016}. Autori v nej nazbierali dáta z piatich produkčných systémov. Tieto dáta manuálne spracovali a vytvorili tzv. golden standard, čiže ideálne rozdelenie správ na clustre. Voči tomuto rozdeleniu potom počítame hodnotu štatistiky F-measure na výsledkoch algoritmu \parencite{goldenstandard}. My sme ďalej pre každý tento dataset určili hodnoty oddeľovačov slov a dáta sme detailnejšie očistili.
+Ako základ pre naše vyhodnotenie sme použili štúdiu \parencite{he2016}. Autori v nej nazbierali dáta z piatich produkčných systémov. Tieto dáta manuálne spracovali a vytvorili tzv. golden standard, čiže ideálne rozdelenie správ na clustre. Voči tomuto rozdeleniu potom počítame hodnotu štatistiky F-measure na výsledkoch algoritmu \parencite{goldenstandard}. My sme ďalej pre každý takýto dataset určili hodnoty oddeľovačov slov a dáta sme detailnejšie očistili.
 
 \subsection{Presnosť Extendedd Nagappan-Vouk}
-Ako môžme vidieť na obrázku \ref{fig:chart-precision-eng}, algoritmus pre všetky hodnoty q-percentilu dosahuje vysoké hodnoty F-Measure. Výnimkou je len dataset BGL, pre ktorý je hodnota F-Measure globálne nížšia.
+Ako môžme vidieť na obrázku \ref{fig:chart-precision-eng}, algoritmus pre všetky hodnoty Q-Percentilu dosahuje vysoké hodnoty F-Measure. Výnimkou je len dataset BGL, pre ktorý je hodnota F-Measure globálne nížšia. Avšak pri správnom nastavení aj na tomto datasete vieme dosiahnuť uspokojivej presnosti.
 
 	\begin{figure}[htbp]
 	 \centering
@@ -60,18 +60,18 @@ Ako môžme vidieť na obrázku \ref{fig:chart-precision-eng}, algoritmus pre v�
 	    color=orange,
 	]
 	coordinates {(5,0.9903) (15,0.9991)  (25,0.9999) (50, 0.9992) (75, 0.9993) (99, 0.9271)};
-	\addlegendentry{SOSP};
+	\addlegendentry{Zookeeper};
 	 
 		\end{axis}
 	\end{tikzpicture}
- 	\caption{Presnosť algoritmu}
+ 	\caption{Presnosť algoritmu Extended Nagappan-Vouk}
  	\label{fig:chart-precision-eng}
  \end{minipage}
 \end{figure} 
 
 
 \subsection{Výkonnosť Extendedd Nagappan-Vouk}
-Uznávame, že dané datasety o mohutnosti 2000 záznamom nie sú dostačujúce na vyvodenie záveru, ale poskytujú základný prehľad o výkonnosti algoritmu. Keď namerané čísla porovnáme s výsledkami z \parencite{he2016} vidíme, že Extended Nagappan-Vouk pracuje pomalšie ako SLCT alebo IPLoM, ale radovo sú časy behu rovnaké. Je potrebné si všimnúť koreláciu medzi F-Measure a dĺžkou behu algoritmu. Čím je F-Measure vyššie a analýza presnejšia, tým sa skracuje čas potrebný na spracovanie daného datasetu.
+Uznávame, že dané datasety o mohutnosti 2000 záznamov nie sú dostačujúce na vyvodenie záveru, ale poskytujú základný prehľad o výkonnosti algoritmu. Keď namerané čísla porovnáme s výsledkami z \parencite{he2016} vidíme, že Extended Nagappan-Vouk pracuje pomalšie ako SLCT alebo IPLoM, ale radovo sú časy behu rovnaké. Je potrebné si všimnúť koreláciu medzi F-Measure a dĺžkou behu algoritmu. Čím je F-Measure vyššie a analýza je presnejšia, tým sa skracuje čas potrebný na spracovanie daného datasetu.
 
 	\begin{figure}[htbp]
 	 \centering
@@ -125,13 +125,13 @@ Uznávame, že dané datasety o mohutnosti 2000 záznamom nie sú dostačujúce 
 	 
 		\end{axis}
 	\end{tikzpicture}
- 	\caption{Presnosť algoritmu}
+ 	\caption{Dĺžka behu algoritmu}
  	\label{fig:chart-precision-eng}
  \end{minipage}
 \end{figure} 
 
 \subsection{Spresnenie algoritmu predspracovaním}
-Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú parametre typu ip adresa alebo email môže byť náročné, kvôli potrebe správne nastaviť hodnotu oddeľovačov slov tak, aby boli správne rozpoznané ako jeden parameter. Preto sme chceli overiť, či dodatočné predspracovanie správ a nahradenie týchto parametrov ich hashom zmenší závislosť na správnom nastavení oddeľovačov slov a zvýši presnosť.
+Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú parametre typu ip adresa alebo email môže byť náročné, kvôli potrebe správne nastaviť hodnotu oddeľovačov slov tak, aby boli správne rozpoznané ako jeden parameter. Preto sme chceli overiť, či dodatočné predspracovanie správ a nahradenie týchto parametrov ich zahešovanou hodnotou, zmenší závislosť na správnom nastavení oddeľovačov slov a zvýši presnosť.
 
 \par Empirickou metódou sme určili zoznam kandidátov na takúto zámenu. Sú to tieto parametre:
 
@@ -143,4 +143,4 @@ Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú 
   \item ISO časová známka
 \end{enumerate}
 
-Pred samotnou analýzou teda prejdeme všetky správy a každý výskyt jedného z vymenovaných parametrov nahradíme jeho hashom. Pri samotnom behu algoritmu Nagappan-Vouk teda nedôjde k rozdelenie podľa oddeľovača slov. Ďalej už algorimus postupuje štandardne ako bolo popísane v \ref{sec:eng}. Porovnaním výsledkov sme zistili, že nami prezentované riešenie neviedlo k zlepšeniu presnosti parsovacích vzorov. Priemer F-Measure pôvodného algoritmu je 0.81 pričom priemer verzie s predspracovaním je len 0.78. Čísla za jednotlivé datasety ukazujú, že v prípadoch, kde pôvodný algoritmus dosiahol nízku presnosť, upravená verzia nebola schopná túto presnosť výrazne prekonať. V datasetoch s vysokou presnosťou nami upravený algoritmus len kopíruje pôvodnú verziu a pre dataset Zookeeper dokonca zhoršuje priemernú presnosť. Tieto merania sú ale špecifické tým, že parameter oddeľovačov slov je nastavený podľa znalosti domény daného datasetu a preto pôvodná verzia produkuje veľmi presné výsledky. Ďalej sme zistili, že takéto predspracovanie výkonnosť algoritmu ovplyvňuje len nepatrne.
+Pred samotnou analýzou teda prejdeme všetky správy a každý výskyt jedného z vymenovaných parametrov nahradíme jeho zahešovanou hodnotou. Pri samotnom behu algoritmu Nagappan-Vouk teda nedôjde k rozdelenie podľa oddeľovača slov. Ďalej už algorimus postupuje štandardne ako bolo popísane v \ref{sec:eng}. Porovnaním výsledkov sme zistili, že nami prezentované riešenie neviedlo k zlepšeniu presnosti parsovacích vzorov. Priemer F-Measure pôvodného algoritmu je 0.81 pričom priemer verzie s predspracovaním je len 0.78. Čísla za jednotlivé datasety ukazujú, že v prípadoch, kde pôvodný algoritmus dosiahol nízku presnosť, upravená verzia nebola schopná túto presnosť výrazne prekonať. V datasetoch s vysokou presnosťou nami upravený algoritmus len kopíruje pôvodnú verziu a pre dataset Zookeeper dokonca zhoršuje priemernú presnosť. Tieto merania sú ale špecifické tým, že parameter oddeľovačov slov je nastavený podľa znalosti domény daného datasetu a preto pôvodná verzia produkuje veľmi presné výsledky. Ďalej sme zistili, že takéto predspracovanie výkonnosť algoritmu ovplyvňuje len nepatrne.

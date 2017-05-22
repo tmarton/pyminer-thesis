@@ -7,17 +7,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[
-  digital, %% This option enables the default options for the
+  printed, %% This option enables the default options for the
            %% digital version of a document. Replace with `printed`
            %% to enable the default options for the printed version
            %% of a document.
   table,   %% Causes the coloring of tables. Replace with `notable`
            %% to restore plain tables.
+ oneside,
   lof,     %% Prints the List of Figures. Replace with `nolof` to
            %% hide the List of Figures.
-  lot,     %% Prints the List of Tables. Replace with `nolot` to
+  lot     %% Prints the List of Tables. Replace with `nolot` to
            %% hide the List of Tables.
-  monochrome
   %% More options are listed in the user guide at
   %% <http://mirrors.ctan.org/macros/latex/contrib/fithesis/guide/mu/fi.pdf>.
 ]{fithesis3}
@@ -50,17 +50,17 @@
     author        = Tomáš Márton,
     gender        = m,
     advisor       = RNDr. Daniel Tovarňák,
-    title         = {Interaktivní správa a~odhalování parsovacích pravidel pro logovací data},
-    TeXtitle      = {Interaktivní správa a~odhalování parsovacích pravidel pro logovací data},
+    title         = {Interaktivní správa a odhalování parsovacích pravidel pro logovací data},
+    TeXtitle      = {Interaktivní správa a odhalování parsovacích pravidel pro logovací data},
     keywords      = {Logovanie, Clustering, Frequent Pattern Mining, Extended Nagappan-Vouk},
     TeXkeywords   = {Logovanie, Clustering, Frequent Pattern Mining, Extended Nagappan-Vouk},
     bib           = ./thesis.bib,
 }
 \thesislong{abstract}{
-    Táto diplomová práca sa zaoberá odhaľovaním parsovacích vzorov systémových logov, konkrétne algoritmom Extended Nagappan-Vouk. Práca takisto vyhodnocuje a implementuje webové užíveteľské roz\-hra\-nie pre tento algoritmus.
+    Diplomová práca sa zaoberá odhaľovaním parsovacích vzorov systémových logov, konkrétne algoritmom Extended Nagappan-Vouk. Tento algoritmus vyhodnocuje a implementuje webové užíveteľské rozhranie pre tento algoritmus.
 }
 \thesislong{thanks}{
-Rád by som poďakoval RNDr. Danielovi Tovarňákovi, vedúcemu tejto diplomovej práce, za vedenie a podnetné návrhy. Ďalej by som sa rád poďakoval svojej rodine a priateľom za podporu pri písaní tejto práce.
+Rád by som poďakoval RNDr. Danielovi Tovarňakovi, vedúcemu tejto diplomovej práce za vedenie a podnetné návrhy. Ďalej by som sa rád poďakoval svojej rodine a priateľom za podporu pri písaní tejto práce.
 }
 \usepackage{makeidx}      %% The `makeidx` package contains
 \makeindex                %% helper commands for index typesetting.
@@ -90,6 +90,6 @@ Rád by som poďakoval RNDr. Danielovi Tovarňákovi, vedúcemu tejto diplomovej
 \include{installation}
 \include{conclusion}
 
-\printbibliography
+ \printbibliography
 
 \end{document}

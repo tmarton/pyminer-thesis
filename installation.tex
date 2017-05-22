@@ -1,10 +1,9 @@
 \chapter{Inštalácia a nasadenie}
-Implementovaná aplikácia používa len voľne dostupné knižnice a~nás\-troje, ktoré sú schopné bežať na všetkých majoritných operačných systémoch. Predpokladáme ale, že aplikácia bude hlavne nasadená na linuxový server, ako je to bežné.
-\par Z tohto dôvodu sme vytvorili scripty, ktoré by mali administrátorovi pomôcť automatizovať proces nasadenia na linuxový server RHEL len za použitia nevyhnutne minimálnej konfigurácie. Použili sme pritom Python virtuálne prostredie, konzolové nástroje Fabric a~Ansible.
+Implementovaná aplikácia používa len voľne dostupné knižnice a nástroje, ktoré sú schopné bežat na všetkých majoritných operačných systémoch. Predpokladáme ale, že aplikácia bude hlavne nasadená na linuxový server ako je to bežné. Preto sme vytvorili scripty, ktoré by mali administrátorovi pomôcť automatizovať proces nasadenia na linuxový server RHEL len za použitia nevyhnutne minimálnej konfigurácie. Použili sme pritom python virtuálne prostredie, konzolové nástroje Fabric a Ansible.
 
 \section{Príprava prostredia}
-V tejto fáze si aktivujeme Python virtuálne prostredie a prostredníctvom pip balíčkovacieho manažéra si nainštalujeme Fabric.
-Fabric je nástroj, ktorý nám dovolí písaním Python kódu volať služby ope\-račného systému. Týmto spôsobom:
+V~tejto fáze si aktivujeme python virtuálne prostredie a prostredníctvom pip balíčkovacieho manažéra si nainštalujeme lokálne Fabric.
+Fabric je nástroj, ktorý nám dovolí písaním python kódu volať služby operačného systému. Týmto spôsobom: 
 
 \begin{enumerate}
   \item Vygenerujeme ssh kľúče
@@ -19,14 +18,14 @@ Ansible je nástroj, ktorý je priamo určený na automatické nasadzovanie cez 
 
 \begin{enumerate}
   \item Pomocou balíčkovacieho manažéra dnf nainštaluje všetky potrebné závislosti systému.
-  \item Klon zdrojových súborov z repozitáru.
+  \item Klon zdrojových súborov z~repozitáru.
   \item Nainštaluje PostreSQL a Redis ako službý a spustí ich
   \item Vytvorí virtuálne prostredie pre python a pomocou pip nainštaluje potrebné závislosti
   \item Nainštaluje a spustí Gunicorn - WSGI server pre python
-  \item Stiahne si inštaláciu Node.js, nainštaluje ju a zkompiluje klientskú aplikáciu v produkčnom nastavení
+  \item Stiahne si inštaláciu Node.js, nainštaluje ju a zkompiluje klientskú aplikáciu v~produkčnom nastavení
   \item Nainštaluje Nginx a nastavíme ho tak aby poskytoval statické súbory priamo a zároveň slúžil ako reverse proxy pre Gunicorn server
 \end{enumerate}
 
-Takto naimplementované nasadenie je skoro plne automatické a administrátor potrebuje len zašpecifikovať ip adresu vzialeného serveru, heslo na prihlásenie a po vyzvaní zadať prihlasovacie údaje k git repozitáry.
+Takto naimplementované nasadenie je skoro plne automatické a administrátor potrebuje len zašpecifikovať ip adresu vzialeného serveru, heslo na prihlásenie a po vyzvaní zadať prihlasovacie údaje k~git repozitáru.
 
 

@@ -1,19 +1,19 @@
 \chapter{Problematika logovania}
 
-Logové súbory sú neoddeliteľnou súčasťou každého softwéru. Či už sa jedná o operačný systém, aplikačný server, softwér v sieťových prvkoch alebo koncovú užívateľskú aplikáciu. 
-\par Logové súbory zaznamenávajú všetky udalosti od štartu, cez beh a chybové stavy až po ukončenie aplikácie. Ich analýza je často je\-diným spôsobom, ako odhaliť chybu, lebo logovanie nijako nenarúša ani neovplyvňuje beh programu. To predstavuje presný opak analýzy bežiaceho programu, pri ktorej analytický proces priamo komunikuje s programom za časovo alebo zdrojovo kritických podmienok  \parencite{jvaldman}. Analýza logových súborov sa takisto môže využiť aj na detekciu anomálií, monitorovanie systému, odhadovanie a plánovanie záťaže systému \parencite{logengineering}.
-\par Do logových súborov sú zapisované pološtrukturované správy, ktoré vývojári softwéru používajú kvôli jednoduchosti a flexibilite \parencite{he2016, ibm}. Informácie, ktoré sa zvyčajne nachádzajú v popise v každej logovacej správe \parencite{weblog, datapreprocessing, sshd}, sú:
+Logové súbory sú neoddeliteľnou súčasťou každého softwéru. Či už sa jedná o~operačný systém, aplikačný server, softwér v~sieťových prvkoch alebo koncovú užívateľskú aplikáciu. 
+\par Logové súbory zaznamenávajú všetky udalosti od štartu, cez beh a chybové stavy až po ukončenie aplikácie. Ich analýza je často jediným spôsobom ako odhaliť chybu, lebo logovanie nijak nenarúša ani neovplyvňuje beh programu. To je presný opak analýzy bežiaceho programu, pri ktorej analytický proces priamo komunikuje s~programom za časovo alebo zdrojovo kritických podmienok  \parencite{jvaldman} . Ďalej sa ešte analýza logových súborov môže využiť na detekciu anomálií, monitorovanie systému, odhadovanie a plánovanie záťaže systému \parencite{logengineering}.
+\par Do logových súborov sú zapisované pološtrukturované správy, ktoré vývojári softwéru používajú kvôli jednoduchosti a flexibilite \parencite{he2016, ibm}. Informácie ktoré sa často nachádzajú v~popise v~každej logovacej správe \parencite{weblog, datapreprocessing, sshd}:
 \begin{itemize}
   \item dátum a čas
   \item ip adresa alebo hostname
   \item komponenta
   \item protokol
 \end{itemize}
-\par Vo všeobecnosti síce nie je ustálený jednotný formát správ, ale existujú dobre známe formáty ako napr. \emph{Common Log Format}, používaný pre logovanie http požiadavkov \parencite{CLF} , flexibilnejši \emph{Extended Log Format} \parencite{ELF} alebo \emph{Syslog format}, využívaný pre logovanie udalostí v systéme Unix \parencite{syslog}. Tieto formáty sú často využívané a existujú pre ne aj analytické nástroje. \
+\par Vo všeobecnosti nie je ustálený jednotný formát správ, ale existujú dobre známe formáty ako napr. \emph{Common Log Format}, používaný pre logovanie http požiadavkov \parencite{CLF} , flexibilnejši \emph{Extended Log Format} \parencite{ELF} alebo \emph{Syslog format}, využívaný pre logovanie udalostí v~systéme Unix \parencite{syslog}, ktoré sú často využívané a existujú pre ne aj analytické nástroje. \
 
 \section{Motivácia}
 
-\par Hoci je zapisovanie a ukladanie logových súborov jednoduchá a lacná úloha, ich ďalšia analýza môže zabrať značné zdroje, čas aj sofistikované metódy. V extrémnych prípadoch môže jeden uzol vygenerovať až okolo pol milióna správ za deň, čo v sledovanom systéme vyústilo do 400 GB nekomprimovaných dát za dva mesiace \parencite{google}. Aj keď sa~od\-pros\-tíme od takýchto prípadov, logovacie súbory sú stále príliš veľké na manuálne spracovanie, a preto je potrebné proces ich spracovania automatizovať. Počas tohto procesu extrahujeme z logovacej správy jej statickú a~dynamickú časť. Statická časť predstavuje konštantný reťazec znakov a~budeme ho ďalej nazývať parsovací vzor. Dyna\-mickú časť tvoria parametre parsovacieho vzoru a~môžu byť pre~každú správu rôzne. Výsledok extrakcie môžeme vidieť v tabuľke~\ref{tab:a}, kde je dynamická časť znázornená znakom \emph{*}. 
+\par Hoci je zapisovanie a ukladanie logových súborov jednoduchá a lacná úloha, ich ďalšia analýza môže zabrať značné zdroje, čas aj sofistikované metódy. V~extrémnych prípadoch môže jeden uzol vygenerovať až okolo pol milióna správ za deň, čo v~sledovanom systéme vyústilo do 400 GB nekomprimovaných dát za 2 mesiace \parencite{google}. Aj keď sa odprostíme od takýchto prípadov, logovacie súbory sú stále príliš veľké na manuálne spracovanie.  Proces spracovania logových správ je preto potrebné  automatizovať. Počas tohto procesu extrahujeme z~logovacej správy jej statickú a dynamickú časť. Statická časť je konštantný reťazec znakov a budeme ho ďalej nazývať parsovací vzor. Dynamická časť sú parametre parsovacieho vzoru a môžu byť pre každú správu rôzne. Výsledok extrakcie môžme vidieť v~tabuľke \ref{tab:a}, kde dynamická časť je znázornená znakom \emph{*}. 
 
 \begin{table}[htbp]
 \centering
@@ -34,11 +34,11 @@ Generating * bit RSA key                                      \\
 Illegal user * from *                                          \\
 * password for * from * port * ssh2                           
 \end{tabularx}
-\caption{Logové správy z sshd a ich parsovacie vzory}
+\caption{Logové správy z~sshd a ich parsovacie vzory}
 \label{tab:a}
 \end{table}
 
-\par Triviálny prístup je použiť jednoduchú sadu vzorov napísaných použitím regulárnych výrazov. Je to síce zlepšenie, ale bez špecifickej znalosti zdrojového kódu nie je možné odhaliť všetky vzory. Navyše sa ukázalo ako neudržateľné spravovať takéto vzory dlhodobo, kedže logovacie správy sa často menia \parencite{xu2010}. Preto je potrebné mať k dispozícií nástroj, ktorý vzory odhalí automaticky.
+\par Triviálny prístup je použiť jednoduchú sadu vzorov napísaných použitím regulárnych výrazov. Je to síce zlepšenie, ale bez špecifickej znalosti zdrojového kódu nie je možné odhaliť všetky vzory a naviac sa ukázalo ako neudržateľné spravovať takéto vzory dlhodobo, kedže logovacie správy sa často menia \parencite{xu2010}. Preto je potrebné mať k~dispozícií nástroj, ktorý tieto vzory odhalí automaticky.
 
 
 
