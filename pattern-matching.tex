@@ -40,11 +40,8 @@ Hlavným negatívom, ktorý vyplýva z~podstaty analýzy zdrojových kódov, je 
 Pre potreby definície clustrovania logovacích správ si zadefinujme logovaciu správu ako bod definovaný n-početnou množinou nominálnych atribútov. Potom clustrovanie vieme popísať ako hľadanie rozdelenia takýchto bodov do konečnej skupiny kategórií -- clustrov, kde body v~jednom clustri sú si navzájom podobné, a zároveň čo najviac rozdielne od členov iných clustrov na základe svojich atribútov \parencite{iplom}. Na určenie toho, ako veľmi sú dve správy podobné, sa používa vzdialenostná funkcia. Ako bolo spomenuté v \parencite{logcluster}, vzdialenostné funkcie tradičných clustrovacích algoritmov vyžadujú tieto vlastnosti: 
 
 \begin{enumerate}
-  \item tokeny prevažne numerického tvaru
-  \item fixný a nízky počet tokenov
-  \item možnosť ignorovať poradie
-  \item atribúty prevažne numerického tvaru 
-  \item fixný a nízky počet atribútov 
+  \item atribúty prevažne numerického tvaru
+  \item fixný a nízky počet atribútov
 \end{enumerate}
 
 Tieto vlastnosti ale body reprezentujúce logovacie správy nespĺňajú. Je to spôsobené tým, že body s nominálnymi atribútmi mávajú často variabilný počet atribútov. Preto nie je triviálne určiť, ako sa bude vzdialenosť týchto bodov merať, aj keď existujú vzdialenostné funkcie pre body s nominálnymi atribútmi, napr. Jaccardov koeficient \parencite{slct}. Ďalej v \parencite{logcluster} bolo ukázané, že doterajšie vzdialenostné funkcie nepracujú presne v pri počte atribútov vyššom ako 10 a často neodhalia cluster. Kombinácia týchto vlastností spôsobuje, že tradičné vzdialenostné funkcie sú na clustrovanie logovacích správ nevhodné. Spôsobov, podľa ktorých možno jednotlivé clustre vytvárať, je niekoľko a každý algoritmus používa svoj postup, ako si ukážeme ďalej. Najprv si ale pre nasledujúcu časť zadefinujeme pojmy, ktoré budeme používať pri popise algoritmov. Logovací súbor budeme nazývať dataset, jeho jednotlivé riadky budeme považovať za správy, ktorých každé slovo bude reprezentovať jeden token. Ďalej kvôli všeobecne zaužívanej konvencii budeme dynamickú časť nájdeného parsovacieho vzoru označovať ako wildcard a v~samotnom vzore ho budeme nahradzovať znakom \emph{*}. 
