@@ -4,17 +4,42 @@ Hlavnou úlohou navrhovaného systému je umožniť užívateľovi pohodlne prac
 
 \section{Užívateľské akcie - prípady užitia}
 
-Systém automaticky predpokladá, že užívateľ pri prístupe má v~pláne začat analyzovať logovacie správy. Užívateľ je preto presmerovaný na záložku Miner do stavu začatia novej analýzy. V~tomto stave môže užívateľ zadať zdroj dát, z~ktorého budú pochádzať data analyzované v~ďalšom kroku, alebo tento krok preskočí. Následne môže ako zdroj vstupných dát vybrať logovací súbor alebo použiť nespracované logovacie správy, ktoré sú v~systéme uložené. Dostupné su aj nastavenia algoritmu, ktoré sú špecifické pre nasledovný beh analýzy. Užívateľovi sú potom prezentované nájdené parsovacie vzory, ktoré sa buď môže rozhodnúť potvrdiť ako s~nimi ďalej pracovať. Uživateľ si ďalej môže nájdené vzory prehliadnuť, zobraziť správy ktoré k~nemu patria, poprípade daný vzor odstrániť. Nájdené vzory sa dajú filtrovať podľa zdroja správ a vyexportovať.
+Systém automaticky predpokladá, že užívateľ pri prístupe má v~pláne začat analyzovať logovacie správy. Užívateľ je preto presmerovaný na záložku Miner do stavu začatia novej analýzy. V~tomto stave môže užívateľ zadať zdroj dát, z~ktorého budú pochádzať data analyzované v~ďalšom kroku, alebo tento krok preskočí. Následne môže ako zdroj vstupných dát vybrať logovací súbor alebo použiť nespracované logovacie správy, ktoré sú v~systéme uložené. Dostupné su aj nastavenia algoritmu, ktoré sú špecifické pre nasledovný beh analýzy. Užívateľovi sú potom prezentované nájdené parsovacie vzory, ktoré sa buď môže rozhodnúť potvrdiť alebo s~nimi ďalej pracovať. Uživateľ si ďalej môže nájdené vzory prehliadnuť, zobraziť správy ktoré k~nemu patria, poprípade daný vzor odstrániť. Nájdené vzory sa dajú filtrovať podľa zdroja správ a vyexportovať. Dané prípady užitia sú prezentované na obr. \ref{fig:use-cases}, ktorý je nasledovaný detailnejším popisom.
+
+\clearpage
 
 \begin{figure}[htbp]
  \centering 
  \begin{minipage}{0.9\linewidth}
  	\centering
- 	\includegraphics[width=\textwidth]{Images/thesis-use-cases.pdf}	
+ 	\includegraphics[width=\textwidth]{images/thesis-use-cases.png}	
  \end{minipage}
   \caption{Prípady užitia}
   \label{fig:use-cases}
 \end{figure}
+
+\begin{enumerate}
+  \item Ako užívateľ zadám vstupný súbor a spustím analýzu
+  \begin{enumerate}
+  	\item Po zobrazení užívateľského rozhrania môžem zadať zdroj dát pre nasledujúcu analýzu alebo môžem tento krok preskočiť
+  	\item Pred spustením môžem meniť hodnotu percentilu a oddeľovačov slov
+  	\item V každom momente môžem začať novú analýzu
+  \end{enumerate}
+  \item Ako užívateľ ktorý už spustil prvotnú analýzu, viem označiť podmnožinu nájdených vzorov a pustiť nad nimi spredňujúcu analýzu
+  \item Ako užívateľ ktorý už spustil prvotnú analýzu, vyberiem nájdený vzor a finalizujem ho
+  \item Ako užívateľ viem filtrovať medzi nájdenými vzormi podľa zdroja dát
+  \item Ako užívateľ viem zobraziť správy, ktoré prislúchajú k danému vzoru
+  \item Ako užívateľ viem zmazať nájdený vzor
+  \item Ako užívateľ viem exportovať nájdené vzory
+  \begin{enumerate}
+  	\item Pred exportom si vyberiem sadu regulárnych výrazov, pomocou ktorých sa nájdený vzor prevedie do formátu REtrie.
+  \end{enumerate}
+  \item Ako užívateľ viem importovať sadu regulárnych výrazov pre export
+  \item Ako užívateľ viem zmazať sadu regulárnych výrazov pre export
+  \begin{enumerate}
+  	\item Ak je daná sada rôzna od defaultnej, ktorá nejde zmazať zo systému
+  \end{enumerate}
+\end{enumerate}
 
 \section{Komponenty systému}
 Po preskúmaní požiadaviek sme dospeli k~záveru, že systém vieme ďalej rozdeliť do týchto kategógií:

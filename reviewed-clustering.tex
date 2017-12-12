@@ -50,7 +50,7 @@ Z~hore uvedeného rozboru vyplýva, že ideálny algoritmus by mal zahrňovať u
 \label{sec:eng}
 RURC definuje všeobecné princípy analýzy logovacích súborov, avšak nešpecifikuje algoritmus, ktorý má byť použitý na clustrovanie správ.
 Z~nedostatkov zmienených v~predchádzajúcej kapitole ale vyplýva, že žiaden algoritmus okrem LogCluster sa nehodí na použitie v~RURC.
-\par RNDr. Daniel Tovarňák preto vyvinul algoritmus Extended Na\-gappan-Vouk určený pre použitie v~RURC, ktorý bude spĺnať všetky požiadavky RURC a zároveň bude jednoduchšie nastaviteľný ako LogCluster. Algoritmus produkuje parsovacie vzory vo formáte, ktorý popisuje paramter ako \emph{\%\{m,n\}} $\%\{m,n\}$. Podobne ako pri LogClustry to označuje \emph{m} až \emph{n} za sebou idúcich tokenov. Napr. parsovací vzor \emph{Software caused \%\{1,3\}} zachytí správu ktorá obsahuje text \emph{Software caused} nasledovaný 1 až 3 slovami oddelenými medzerou. \newpage \par Postup algoritmu:
+\par RNDr. Daniel Tovarňák preto vyvinul algoritmus Extended Na\-gappan-Vouk určený pre použitie v~RURC, ktorý bude spĺnať všetky požiadavky RURC a zároveň bude jednoduchšie nastaviteľný ako LogCluster. Algoritmus produkuje parsovacie vzory vo formáte, ktorý popisuje parameter ako \emph{\%\{m,n\}} $\%\{m,n\}$. Podobne ako pri LogClustry to označuje \emph{m} až \emph{n} za sebou idúcich tokenov. Napr. parsovací vzor \emph{Software caused \%\{1,3\}} zachytí správu ktorá obsahuje text \emph{Software caused} nasledovaný 1 až 3 slovami oddelenými medzerou. \newpage \par Postup algoritmu:
 
 \begin{enumerate}
  \item Správy sa rozdelia na tokeny na základe užívateľom zadaných oddeľovačov slov.

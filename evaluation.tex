@@ -1,5 +1,7 @@
 \chapter{Vyhodnotenie Extended Nagappan-Vouk}
-Navrhnutý algoritmus adresuje nedostatky už existujúch algoritmov a odstraňuje ich, ale aby bol skutočne použiteľný je potrebné, aby dosahoval  všeobecne presné výsledky a zvládal pracovať aj s vačším množstvom dát. Ďalej nás bude zaujímať, či vieme ešte viac spresniť jeho výsledky predspracovaním logovacích správ a ako takýto preprocesing ovplyvní výkonnosť algoritmu. Preto budeme skúmať tieto otázky:
+Navrhnutý algoritmus adresuje nedostatky už existujúch algoritmov a odstraňuje ich, ale aby bol skutočne použiteľný je potrebné, aby dosahoval  všeobecne presné výsledky a zvládal pracovať aj s vačším množstvom dát. 
+
+\par Ďalej nás bude zaujímať, či vieme ešte viac spresniť jeho výsledky predspracovaním logovacích správ a ako takýto preprocesing ovplyvní výkonnosť algoritmu. Preto budeme skúmať tieto otázky:
 
 \begin{enumerate}
   \item Aká je presnosť algoritmu Extended Nagappan-Vouk na reálnych dátach ?
@@ -131,7 +133,8 @@ Uznávame, že dané datasety o mohutnosti 2000 záznamov nie sú dostačujúce 
 \end{figure} 
 
 \subsection{Spresnenie algoritmu predspracovaním}
-Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú parametre typu ip adresa alebo email môže byť náročné, kvôli potrebe správne nastaviť hodnotu oddeľovačov slov tak, aby boli správne rozpoznané ako jeden parameter. Preto sme chceli overiť, či dodatočné predspracovanie správ a nahradenie týchto parametrov ich zahešovanou hodnotou, zmenší závislosť na správnom nastavení oddeľovačov slov a zvýši presnosť.
+Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú parametre typu ip adresa alebo email môže byť náročné, kvôli potrebe správne nastaviť hodnotu oddeľovačov slov tak, aby boli správne rozpoznané ako jeden parameter. 
+\par Chceme teda overiť, či dodatočné predspracovanie správ a nahradenie týchto parametrov ich zahešovanou hodnotou, zmenší závislosť na správnom nastavení oddeľovačov slov a zvýši presnosť.
 
 \par Empirickou metódou sme určili zoznam kandidátov na takúto zámenu. Sú to tieto parametre:
 
@@ -143,4 +146,6 @@ Zistili sme, že správne odhaliť parsovacie vzory zo správ, ktoré obsahujú 
   \item ISO časová známka
 \end{enumerate}
 
-Pred samotnou analýzou teda prejdeme všetky správy a každý výskyt jedného z vymenovaných parametrov nahradíme jeho zahešovanou hodnotou. Pri samotnom behu algoritmu Nagappan-Vouk teda nedôjde k rozdelenie podľa oddeľovača slov. Ďalej už algorimus postupuje štandardne ako bolo popísane v \ref{sec:eng}. Porovnaním výsledkov sme zistili, že nami prezentované riešenie neviedlo k zlepšeniu presnosti parsovacích vzorov. Priemer F-Measure pôvodného algoritmu je 0.81 pričom priemer verzie s predspracovaním je len 0.78. Čísla za jednotlivé datasety ukazujú, že v prípadoch, kde pôvodný algoritmus dosiahol nízku presnosť, upravená verzia nebola schopná túto presnosť výrazne prekonať. V datasetoch s vysokou presnosťou nami upravený algoritmus len kopíruje pôvodnú verziu a pre dataset Zookeeper dokonca zhoršuje priemernú presnosť. Tieto merania sú ale špecifické tým, že parameter oddeľovačov slov je nastavený podľa znalosti domény daného datasetu a preto pôvodná verzia produkuje veľmi presné výsledky. Ďalej sme zistili, že takéto predspracovanie výkonnosť algoritmu ovplyvňuje len nepatrne.
+Pred samotnou analýzou teda prejdeme všetky správy a každý výskyt jedného z vymenovaných parametrov nahradíme jeho zahešovanou hodnotou. Pri behu algoritmu Nagappan-Vouk teda nedôjde k rozdelenie podľa oddeľovača slov. 
+\par Porovnaním výsledkov sme zistili, že nami prezentované riešenie neviedlo k zlepšeniu presnosti parsovacích vzorov. Priemer F-Measure pôvodného algoritmu je 0.81 pričom priemer verzie s predspracovaním je len 0.78. Čísla za jednotlivé datasety ukazujú, že v prípadoch, kde pôvodný algoritmus dosiahol nízku presnosť, upravená verzia nebola schopná túto presnosť výrazne prekonať. V datasetoch s vysokou presnosťou nami upravený algoritmus len kopíruje pôvodnú verziu a pre dataset Zookeeper dokonca zhoršuje priemernú presnosť. 
+\par Tieto merania sú ale špecifické tým, že parameter oddeľovačov slov je nastavený podľa znalosti domény daného datasetu a preto pôvodná verzia produkuje veľmi presné výsledky. Ďalej sme zistili, že takéto predspracovanie výkonnosť algoritmu ovplyvňuje len nepatrne.
