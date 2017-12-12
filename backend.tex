@@ -1,5 +1,5 @@
 \chapter{Serverová časť}
-Hlavnou funkcionalitou tejto časti je obslúžiť požiadavky prichádzajúce ako http volania, spracovať ich a vrátiť výsledok vo formáte JSON. Backend sa teda priamo nestará o obslúženie užívateľských akcií, ani o routovanie a len odpovedá na volania z klienta. V REST api vystavujeme tieto metódy:
+Hlavnou funkcionalitou tejto časti je obslúžiť požiadavky prichádzajúce ako http volania, spracovať ich a vrátiť výsledok vo formáte JSON. Backend sa teda priamo nestará o obslúženie užívateľských akcií, ani o routovanie, ale len odpovedá na volania z klienta. V REST api vystavujeme tieto metódy:
 
 \newcolumntype{M}[1]{>{\arraybackslash}m{#1}}
 \newcolumntype{N}[1]{>{\centering\arraybackslash}m{#1}}
@@ -15,7 +15,7 @@ POST   & /api/patterns/             & Finalizuje parsovací vzor                
 DELETE & /api/patterns/\{pk\}/      & Zmaže vzor                                \\ \hline
 GET    & /api/patterns/\{pk\}/lines & Vráti správy parsovacieho vzoru           \\ \hline
 GET    & /api/export-patterns/      & Transformuje a exportuje parsovacie vzory \\ \hline
-GET    & /api/sources/              & Vráti zdroje zdroje správ                 \\ \hline
+GET    & /api/sources/              & Vráti zdroje správ                 \\ \hline
 GET    & /api/autocomplete/source   & Doplní názov zdroja správ                 \\ \hline
 GET    & /api/autocomplete/version  & Doplní verziu zdroja správ                \\ \hline
 GET    & /api/regex-groups/         & Vráti sady regulárnych výrazov            \\ \hline
@@ -32,7 +32,7 @@ DELETE & /api/regex-groups/\{pk\}/  & Zmaže sadu regulárnych výrazov         
 Pri implementácií sme sa intenzívne spoliehali framework Django. Django obsahuje veľké množstvo modulov, z ktorých sme v našej práci síce využili len malú podmnožinu, ale zásadne nám zjednodušila celú implementáciu. Funkcionalita je rozdelená do samostatných súborov alebo modulov pre jednoduchý a prehľadný kód.
 
 \section{Datový model}
-Aplikácia používa jednoduchý datový model, ktorého jadro tvorí tabuľka \emph{pattern} ako môžme vidieť na obr. \ref{fig:erd}. Atribút \emph{pattern} obsahuje daný vzor v textovej podobe tak, ako ho vidí užívateľ. Atribút regex zase obsahuje validný regulárny výraz, ktorý je použitý na nájdenie logových správ prislúchajúcich k danému vzoru. Tieto logové správy sú potom uložené v tabuľke \emph{pattern\_line}. Kvôli exportu vzorov do formátu REtrie a jeho jednoduchšej implementácií si pre každý nájdený vzor ukladáme informácie o skupinách parametrov v tabuľke \emph{pattern\_group.} Ak bol na začiatku analýzy zadaný pôvod logového súboru, potom bude pre nájdený vzor táto informácia uložená v tabuľke \emph{source}. Úplne oddelene sú v datovom modeli tabuľky \emph{regex\_group} a \emph{regex\_group\_item}. Tieto tabuľky uchovávajú informácie o dostupných sadách regulárnych výrazov použitých pri exporte do formátu REtrie. Pri každom exporte je užívateľ nútený vybrať jednu z uložených sád, preto tieto tabuľky nemajú žiaden vzťah k tabuľke \emph{pattern} a sú v datovom modeli oddelené.
+Aplikácia používa jednoduchý datový model, ktorého jadro tvorí tabuľka \emph{pattern}, ako môžeme vidieť na obr. \ref{fig:erd}. Atribút \emph{pattern} obsahuje daný vzor v textovej podobe tak, ako ho vidí užívateľ. Atribút regex zase obsahuje validný regulárny výraz, ktorý je použitý na nájdenie logových správ prislúchajúcich k danému vzoru. Tieto logové správy sú potom uložené v tabuľke \emph{pattern\_line}. Kvôli exportu vzorov do formátu REtrie a jeho jednoduchšej implementácií si pre každý nájdený vzor ukladáme informácie o skupinách parametrov v tabuľke \emph{pattern\_group.} Ak bol na začiatku analýzy zadaný pôvod logového súboru, potom bude pre nájdený vzor táto informácia uložená v tabuľke \emph{source}. Úplne oddelene sú v datovom modeli tabuľky \emph{regex\_group} a \emph{regex\_group\_item}. Tieto tabuľky uchovávajú informácie o dostupných sadách regulárnych výrazov použitých pri exporte do formátu REtrie. Pri každom exporte je užívateľ nútený vybrať jednu z uložených sád, preto tieto tabuľky nemajú žiaden vzťah k tabuľke \emph{pattern} a sú v datovom modeli oddelené.
 
 \begin{figure}[htbp]
  \centering 
@@ -45,7 +45,7 @@ Aplikácia používa jednoduchý datový model, ktorého jadro tvorí tabuľka \
 \end{figure}
 
 \subsection{Django ORM}
-Pre prístup k dátam z databázy je v celej aplikácii použité objektovo relačné mapovanie zakomponované priamo v Djangu. Využitie Django ORM vo väčšine prípadov vývojára úplne odprostí od potreby implementovať vrstvu pre prístup k dátam, ako je zvyklé napr. v Jave alebo \#C. Django ORM používa potomkov triedy \emph{django.db.models.Model}, ďalej nazývaných ako modely, na zadefinovanie štruktúry dát a pôsobí ako jediný prístupový bod k dátam, napr. \ref{fig:django-model}. Každý model reprezentuje tabuľku v databáze a jeho objekt tohto typu jeden riadok v databáze. 
+Pre prístup k dátam z databázy je v celej aplikácii použité objektovo relačné mapovanie zakomponované priamo v Djangu. Využitie Django ORM vo väčšine prípadov vývojára úplne odprostí od potreby implementovať vrstvu pre prístup k dátam, ako je zvyklé napr. v Jave alebo \#C. Django ORM používa potomkov triedy \emph{django.db.models.Model}, ďalej nazývaných ako modely, na zadefinovanie štruktúry dát, a pôsobí ako jediný prístupový bod k dátam, napr. \ref{fig:django-model}. Každý model reprezentuje tabuľku v databáze a jeho objekt tohto typu jeden riadok v databáze. 
 
 \begin{figure}[htbp]
 \centering
@@ -65,16 +65,16 @@ class Source(models.Model):
 \end{figure}
 
 \subsection{Django migrations}
-Na vytvorenie databázového schématu používame Django migrations. Použitím Django migrations vývojári nemusia písať ddl scripty a modelujú schéma vytváraním tried v jazyku python. Prvotné schéma je vygenerované automaticky, každá ďalšia zmena kódu spôsobí vygenerovanie novej migrácie, ktorá je následne aplikovaná na databázové tabuľky. Tento spôsob sa ukázal ako veľmi nápomocný v deployment scriptoch, kde jednoducho spustíme migráciu príkazom \emph{python manage.py migrate} a nepotrebujeme dodatočného sql klienta na vytvorenie schématu. Zároveň týmto spôsobom vieme do aplikácie aj vložiť iniciálne data.
+Na vytvorenie databázového schématu používame Django migrations. Použitím Django migrations vývojári nemusia písať ddl scripty a modelujú schému vytváraním tried v jazyku python. Prvotná schéma je vygenerovaná automaticky, každá ďalšia zmena kódu spôsobí vygenerovanie novej migrácie, ktorá je následne aplikovaná na databázové tabuľky. Tento spôsob sa ukázal ako veľmi nápomocný v deployment scriptoch, kde jednoducho spustíme migráciu príkazom \emph{python manage.py migrate} a nepotrebujeme dodatočného sql klienta na vytvorenie schémy. Zároveň týmto spôsobom vieme do aplikácie aj vložiť iniciálne data.
 
 \section{Implementácia Extended Nagappan-Vouk}
 Implementácia sa snaží byť čo najrýchlejšia, preto používame knižnicu \emph{multiprocessing}. Väčšina vykonávaných metód najprv rozdelí problém na menšie časti, spočíta výsledok podproblému v novom procese a následne problém spojí. 
-\par  Začína predspracovaním, v ktorom pre každú správu hľadáme sekvenčným prechodom cez už uložené parsovacie vzory ten správny. Ak existuje daná správa je z ďalšieho spracovania vylúčená. Uznávame, že táto operácia nie je veľmi efektívna ako už bolo zmienené v \ref{sec:data-mining} a s narastajúcim počtom uložených správ značne zhorší celkový čas spracovania, preto implementácia tejto operácie môže byť v budúcnosti  jednoducho zameniteľná za riešenie založené na REtrie. Nasleduje samotný beh algoritmu, ktorého výsledky sú uložené do Redisu. Ako návratova hodnota je použitý objekt ktorý obsahuje štatistiku vytvorenú z týchto výsledkov a textovú reprezentáciu parsovacích vzorov.
+\par  Začína predspracovaním, v ktorom pre každú správu hľadáme sekvenčným prechodom cez už uložené parsovacie vzory ten správny. Ak existuje daná správa, je z ďalšieho spracovania vylúčená. Uznávame, že táto operácia nie je veľmi efektívna, ako už bolo zmienené v \ref{sec:data-mining} a s narastajúcim počtom uložených správ značne zhorší celkový čas spracovania, preto implementácia tejto operácie môže byť v budúcnosti  jednoducho zameniteľná za riešenie založené na REtrie. Nasleduje samotný beh algoritmu, ktorého výsledky sú uložené do Redisu. Ako návratova hodnota je použitý objekt, ktorý obsahuje štatistiku vytvorenú z týchto výsledkov a textovú reprezentáciu parsovacích vzorov.
 
 \section{Prevod medzi formátmi parsovacích vzorov}
 \label{sec:format-transformation}
 
-Pri prevode medzi týmito formátmi potrebujeme mať vopred známu sadu typov regulárnych výrazov, voči ktorým budeme konverziu prevádzať. Je žiadúce aby táto sada nebola konštantná pre všetky parsovacie vzory, ale aby bolo možné ju zadať pre vybrané parsovacie vzory. Z tohto dôvodu nie je transformácia medzi formátmi prevádzaná pri uložení parsovacie vzoru, ale je vykonaná on demand pre zadanú sadu typov algoritmom \ref{fig:pattern-transformation}
+Pri prevode medzi týmito formátmi potrebujeme mať vopred známu sadu typov regulárnych výrazov, voči ktorým budeme konverziu prevádzať. Je žiadúce, aby táto sada nebola konštantná pre všetky parsovacie vzory, ale aby bolo možné ju zadať pre vybrané parsovacie vzory. Z tohto dôvodu nie je transformácia medzi formátmi prevádzaná pri uložení parsovacieho vzoru, ale je vykonaná on demand pre zadanú sadu typov algoritmom \ref{fig:pattern-transformation}
 
 \begin{figure}[htbp]
 \centering

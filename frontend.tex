@@ -1,22 +1,22 @@
 \chapter{Klientska časť}
 Táto časť poskytuje užívateľské rozhranie, naviguje užívateľa v~rámci aplikácie, reaguje na jeho akcie a komunikuje s~vystaveným rozhraním serverovej časti aplikácie.
-\par Klienstka časť je naimplementovaná použitím frameworku Angular 2. Nejedná sa o~tzv. single page ako je to bežné u~aplikácií napísaných v~tomto frameworku, ale je rozdelená na tri stránky, kde si každá drží svoj interný stav. Sú to stranký Miner, Mined Patterns a~Regex Groups. Stránka Miner sa slúži na samotné odhaľovanie parsovacích vzorov, zatiaľ čo Stránky Mined Patterns a Regex Groups slúžia na prácu s~finalizovanými parsovacími vzormi resp. sadami typov regulárnych výrazov, určených pre transformáciu vzorov.
+\par Klienstka časť je naimplementovaná použitím frameworku Angular 2. Nejedná sa o~tzv. single page, ako je to bežné pri~aplikáciách napísaných v~tomto frameworku, ale je rozdelená na tri stránky, kde si každá drží svoj interný stav. Sú to stranký Miner, Mined Patterns a~Regex Groups. Stránka Miner slúži na samotné odhaľovanie parsovacích vzorov, zatiaľ čo Stránky Mined Patterns a Regex Groups slúžia na prácu s~finalizovanými parsovacími vzormi, resp. sadami typov regulárnych výrazov určených pre transformáciu vzorov.
 
 
 \section{Angular 2}
-Angular 2 je relatívne nový komponentovo-orientovaný JavaScriptový framework, ktorý odstraňuje nedostatky pôvodnej verzie. Aplikácie sa v~Angular 2 píšu buď v~TypeScripte alebo vo verziách \mbox{ECMAScript}~5 resp. 6. Ani jeden variant zatiaľ nie je plne podporovaný dnešnými prehliadačmi, preto je nutná transkompilácia. My sme použili TypeScript, nadstavbu JavaScriptu, ktorý zavádza statické typovanie a~prvky objektovo-orientovaného programovania ako typy, triedy, moduly a~pod., čo považujeme za veľkú výhodu. Základné stavebné prvky sú:
+Angular 2 je relatívne nový komponentovo-orientovaný JavaScriptový framework, ktorý odstraňuje nedostatky pôvodnej verzie. Aplikácie sa v~Angular 2 píšu buď v~TypeScripte, alebo vo verziách \mbox{ECMAScript}~5 resp. 6. Ani jeden variant zatiaľ nie je plne podporovaný dnešnými prehliadačmi, preto je nutná transkompilácia. My sme použili TypeScript, nadstavbu JavaScriptu, ktorý zavádza statické typovanie a~prvky objektovo-orientovaného programovania ako typy, triedy, moduly a~pod., čo považujeme za veľkú výhodu. Základné stavebné prvky sú:
 
 \begin{enumerate}
  \item Modul -- zpuzdruje funkcionalitu, ktorá vykonáva jednu úlohu. Funguje podobne ako OSGi modul, kde modul vidí len komponenty definované v~samotnom module a komponenty, ktoré modul explicitne importuje. Zároveň modul špecifikuje, ktoré komponenty budú viditeľné zvonku balíčka.
- \item Komponent -- základný prvok aplikácie. Definuje aplikačnú logiku a interaguje so šablónou cez rozhranie vlastností a metód. Potrebná komfigurácia komponenty je zabezpečená cez metadáta.
+ \item Komponent -- základný prvok aplikácie. Definuje aplikačnú logiku a interaguje so šablónou cez rozhranie vlastností a metód. Potrebná konfigurácia komponentu je zabezpečená cez metadáta.
  \item Šablóna -- html stránka obohatená o~značky z~jazyka Angular. Definuje, ako bude zobrazený komponent. Zároveň obsahuje značkovanie pre prepojenie dát, ktoré určuje, ako sú vymieňané dáta medzi komponentom a šablónou. V~predošlej verzii Angularu sa vždy jednalo o~obojsmerné prepojenie, čo spôsobovalo výkonnostné problémy. Vo verzii 2 si vieme toto prepojenie zašpecifikovať a vyhnúť sa tak týmto problémom.
  \item Servisná služba -- trieda, ktorá obsahuje funkcie na vykonanie špecifických úloh potrebných aplikáciou.
  \item Dependency injection -- spôsob založený na rovnomennom návr\-hovom vzore, ktorým Angular poskytuje servisným službám a~komponentom závislosti.
 \end{enumerate}
 
 \subsection{Podporné nástroje}
-Aplikácie písané v~Angular 2 sú závislé na knižniciach tretích strán ako aj na knižniciach samotného Angularu.
-\par Na správu týchto závislostí používame všeobecne známy Node.js a~jeho balíčkovací systém npm, zatiaľ čo na správu samotného kódu používame Webpack, jednoduchý balíčkovač zdrojových kódov. Webpack ponúka široké možnosti, ako zdrojové kódy upraviť pred výsledným zabalením do archívu a zároveň možnosť vystaviť tieto kódy v~rámci vývojového servera, čo sme pri vývoji vo veľkej miere využívali. V~našom systéme Webpack pred výsledným zabalením zdrojové kódy minimalizuje a prevedie optimalizácie.
+Aplikácie písané v~Angular 2 sú závislé na knižniciach tretích strán, ako aj na knižniciach samotného Angularu.
+\par Na správu týchto závislostí používame všeobecne známy Node.js a~jeho balíčkovací systém npm, zatiaľ čo na správu samotného kódu používame Webpack, jednoduchý balíčkovač zdrojových kódov. Webpack ponúka široké možnosti ako zdrojové kódy upraviť pred výsledným zabalením do archívu, a zároveň možnosť vystaviť tieto kódy v~rámci vývojového servera, čo sme pri vývoji vo veľkej miere využívali. V~našom systéme Webpack pred výsledným zabalením zdrojové kódy minimalizuje a prevedie optimalizácie.
 \par Oba tieto nástroje sme ovládali a nastavovali cez nástroj Angular CLI, ktorý umožnuje vygenerovať si projekt už obsahujúci najčastejšiu konfiguráciu.
 
 
@@ -47,7 +47,7 @@ Po tomto kroku máme pred sebou rozhranie, ktorým budeme upravovať a spúšťa
 \end{figure}
 
 \subsection{Mined patterns}
-Rozhranie prezentuje stránkovací zoznam finalizovaných parsovacích vzorov, ktoré si je možné vyfiltrovať podľa zdrojovej aplikácie a jej verzie ako vidíme na obrázku \ref{fig:pattern}. Aktuálny vyfiltrovaný zoznam si~užívateľ vie exportovať do formátu REtrie. Zoznam ďalej umožnuje náhľad na správy, ktoré boli vygenerované použitím vybraného parsovacieho vzoru.
+Rozhranie prezentuje stránkovací zoznam finalizovaných parsovacích vzorov, ktoré si je možné vyfiltrovať podľa zdrojovej aplikácie a jej verzie, ako vidíme na obrázku \ref{fig:pattern}. Aktuálny vyfiltrovaný zoznam si~užívateľ vie exportovať do formátu REtrie. Zoznam ďalej umožnuje náhľad na správy, ktoré boli vygenerované, použitím vybraného parsovacieho vzoru.
 
 \begin{figure}[htbp]
  \centering 
